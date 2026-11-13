@@ -221,8 +221,9 @@ body.jeu-paroles #jeu { overflow: hidden; }
 body.jeu-paroles #jeu .carte { overflow: hidden !important; }
 #chrono-paroles { display: none; position: absolute; right: 22px; bottom: 14px; font-size: 14px; color: var(--doux); background: rgba(9,8,22,.7); padding: 4px 10px; border-radius: 8px; }
 body.jeu-paroles #chrono-paroles.actif { display: block; }
-.paroles-vue { height: calc(7 * 34px * 1.45); overflow: hidden; font-family: var(--titre); font-weight: 600; text-align: center; flex-shrink: 0; }
+.paroles-vue { height: calc(7 * 34px * 1.45); overflow: hidden; font-family: var(--titre); font-weight: 400; text-align: center; flex-shrink: 0; }
 .paroles-defile > div { font-size: 34px; line-height: 1.45; }
+.paroles-defile > div.actuelle, .ligne-actuelle { font-weight: 800; }
 #accueil { position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 34px; padding: 30px;
   background: radial-gradient(ellipse at 50% 0%, #2a1d6b 0%, #120f33 45%, var(--fond) 80%); }
 #accueil.vu { display: flex; }
@@ -297,7 +298,7 @@ body.jeu-paroles #chrono-paroles.actif { display: block; }
     A : écran d'accueil (les 5 jeux)<br>
     R : réarmer · B : ouvrir/fermer<br>
     V : bonne réponse · X : mauvaise<br>
-    ↑ ↓ : une ligne (jeux 2 et 4)<br>
+    ↑ ↓ : ligne suivante / précédente en gras (jeux 2 et 4)<br>
     ← → : chanson précédente / suivante<br>
     1 à 9 : +1 point à l'équipe n°<br>
     Maj + 1 à 9 : −1 point
@@ -921,7 +922,7 @@ function paginer(paras) {
 }
 function creerParoles() {
   const J = { id: 'paroles', nom: 'Terminer les paroles', icone: '🎤' };
-  let idx = -1, racine, phase = 'pret', paras = [], vus = 0, zoneTexte, zoneCmd, cur = null, off = 0, offPrec = 0;
+  let idx = -1, racine, phase = 'pret', paras = [], vus = 0, zoneTexte, zoneCmd, cur = null, off = 0, offPrec = 0, actuelle = 0;
   const FENETRE = 7; // lignes affichées en même temps
   const PAS = 3;     // flèches ↓ ↑ : 3 lignes à chaque appui
   const faits = new Set();
@@ -939,7 +940,7 @@ function creerParoles() {
     Lecteur.stop(); racine.innerHTML = '';
     const n = idx; const c = await FichiersParoles.pourParoles(L()[idx]); if (n !== idx) return;
     cur = c; racine.innerHTML = '';
-    paras = paginer(decouperParagraphes(c)); vus = 0; off = 0; offPrec = 0;
+    paras = paginer(decouperParagraphes(c)); vus = 0; off = 0; offPrec = 0; actuelle = 0;
     racine.append(h('div', { class: 'entete-jeu' },
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🎤 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
@@ -966,7 +967,7 @@ function creerParoles() {
       off = Math.max(0, Math.min(off, lignes.length - 1));
       // toutes les lignes dans une « fenêtre » : le texte glisse vers le haut, sans changer de taille
       const vue = h('div', { class: 'paroles-vue' }), contenu = h('div', { class: 'paroles-defile' });
-      lignes.forEach(l => contenu.append(h('div', {}, l || '\u00a0')));   // toutes les lignes : même taille, même couleur
+      lignes.forEach((l, k) => contenu.append(h('div', { class: k === actuelle ? 'actuelle' : '' }, l || '\u00a0')));   // la ligne à chanter est en gras
       vue.append(contenu); zoneTexte.append(vue);
       const haut = i => (contenu.children[Math.min(i, contenu.children.length - 1)] || { offsetTop: 0 }).offsetTop;
       contenu.style.transition = 'none'; contenu.style.transform = 'translateY(' + (-haut(offPrec)) + 'px)';
@@ -985,7 +986,7 @@ function creerParoles() {
     const c = cur;
     await Lecteur.lancerChanson(c);
     phase = 'lecture';
-    vus = paras.length; off = 0; offPrec = 0;
+    vus = paras.length; off = 0; offPrec = 0; actuelle = 0;
     if (Number(c.arret) > 0) Lecteur.quand(c.arret, stopper);
     rendu();
   }
@@ -1003,9 +1004,11 @@ function creerParoles() {
   // ↓ ↑ : une seule ligne à chaque appui
   J.ligne = d => {
     if (idx < 0 || !zoneTexte || !paras.length) return;
-    if (!vus) { vus = paras.length; off = 0; return rendu(); }
+    if (!vus) { vus = paras.length; off = 0; actuelle = 0; return rendu(); }
     const n = lignesVues().lignes.length;
-    off = Math.max(0, Math.min(n - 1, off + (d > 0 ? 1 : -1)));
+    // principe du karaoké : la ligne en gras descend jusqu'à la 3e ligne de l'écran, ensuite c'est le texte qui remonte
+    actuelle = Math.max(0, Math.min(n - 1, actuelle + (d > 0 ? 1 : -1)));
+    off = Math.max(0, actuelle - 2);
     rendu();
   };
 
@@ -1057,7 +1060,7 @@ function preparerTrou(c) {
 }
 function creerKaraoke() {
   const J = { id: 'karaoke', nom: 'Karaoké – garde le rythme', icone: '🥁', pauseAuBuzz: false };
-  let idx = -1, racine, phase = 'pret', finCoupure = 0, trou = null, revele = false, zoneTexte, zoneEtat, zoneCmd, chrono, cur = null, page = 0, nbPages = 0, pageTrou = 0, off = 0, cible = 0, nbLignes = 0;
+  let idx = -1, racine, phase = 'pret', finCoupure = 0, trou = null, revele = false, zoneTexte, zoneEtat, zoneCmd, chrono, cur = null, page = 0, nbPages = 0, pageTrou = 0, off = 0, cible = 0, nbLignes = 0, actuelle = 0;
   const FENETRE = 7;
   const faits = new Set();
   const L = () => CONFIG.karaoke.chansons || [];
@@ -1074,7 +1077,7 @@ function creerKaraoke() {
   async function afficher() {
     Lecteur.stop(); racine.innerHTML = ''; phase = 'pret'; revele = false;
     const n = idx; const c = await FichiersParoles.pourKaraoke(L()[idx]); if (n !== idx) return;
-    cur = c; racine.innerHTML = ''; trou = preparerTrou(c); page = 0; off = 0; cible = 0;
+    cur = c; racine.innerHTML = ''; trou = preparerTrou(c); page = 0; off = 0; cible = 0; actuelle = 0;
     racine.append(h('div', { class: 'entete-jeu' },
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🥁 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
@@ -1107,18 +1110,19 @@ function creerKaraoke() {
     pageTrou = Math.max(0, pages.findIndex(pg => pg.some(l => l.some(n => n.dataset && n.dataset.trou))));
     const plat = pages.flat(), debuts = []; let acc = 0; pages.forEach(pg => { debuts.push(acc); acc += pg.length; });
     nbLignes = plat.length;
-    if (cible != null) { off = Math.max(0, debuts[Math.min(cible, nbPages - 1)] - 1); cible = null; }   // saut de page : on garde la dernière ligne
+    cible = null;
     off = Math.max(0, Math.min(off, nbLignes - 1));
     page = 0; for (let p = 0; p < nbPages; p++) if (debuts[p] <= off + 1) page = p;
     // fenêtre de lignes visibles ; les lignes d'avant la page en cours sont estompées
     const ligne = (l, style) => { const d = h('div', { style }); l.forEach(n => d.append(n)); return d; };
     let trouVisible = false;
-    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; box.append(ligne(l, off + k < debuts[page] ? 'opacity:.45' : '')); });
+    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; const el = ligne(l, 'font-weight:' + (off + k === actuelle ? 800 : 400)); box.append(el); });
     if (!revele && trouVisible) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
     if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages));
     return box;
   }
-  J.ligne = d => { if (idx < 0 || !zoneTexte || !nbLignes) return; off = Math.max(0, Math.min(nbLignes - 1, off + d)); rendu(); };
+  // principe du karaoké : la ligne en gras descend jusqu'à la 3e ligne de l'écran, ensuite c'est le texte qui remonte
+  J.ligne = d => { if (idx < 0 || !zoneTexte || !nbLignes) return; actuelle = Math.max(0, Math.min(nbLignes - 1, actuelle + d)); off = Math.max(0, actuelle - 2); rendu(); };
   function rendu() {
     const c = cur; zoneTexte.innerHTML = ''; zoneCmd.innerHTML = ''; zoneEtat.innerHTML = '';
     zoneTexte.classList.toggle('karaoke-coupure', phase === 'coupure');
