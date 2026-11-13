@@ -297,7 +297,7 @@ body.jeu-paroles #chrono-paroles.actif { display: block; }
     A : écran d'accueil (les 5 jeux)<br>
     R : réarmer · B : ouvrir/fermer<br>
     V : bonne réponse · X : mauvaise<br>
-    N : paroles suivantes · ↑ ↓ : défiler (jeux 2 et 4)<br>
+    ↑ ↓ : une ligne (jeux 2 et 4)<br>
     ← → : chanson précédente / suivante<br>
     1 à 9 : +1 point à l'équipe n°<br>
     Maj + 1 à 9 : −1 point
@@ -976,7 +976,6 @@ function creerParoles() {
     }
     if (phase === 'stop' || phase === 'revele') zoneTexte.append(trous(c.reponse, phase === 'revele'));
     if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'), h('span', { class: 'note' }, 'au même moment que la musique'));
-    if (phase !== 'revele' && vus < paras.length) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => J.suivant() }, 'Paroles suivantes ▼', h('kbd', {}, 'N')));
     if (phase === 'lecture') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: stopper }, Lecteur.virt ? '⏹ Stop : à vous de chanter' : '⏹ Arrêter ici'));
     if (phase === 'stop') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: reveler }, '👀 Révéler les paroles'));
     if (phase === 'stop' || phase === 'revele') zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { pauseParBuzz = false; Lecteur.reprendre(); } }, Lecteur.virt ? '▶ Continuer' : '▶ Écouter la suite'));
@@ -987,7 +986,6 @@ function creerParoles() {
     await Lecteur.lancerChanson(c);
     phase = 'lecture';
     vus = paras.length; off = 0; offPrec = 0;
-    paras.forEach((p, i) => { if (p.t != null) Lecteur.quand(p.t, () => { off = Math.max(0, debutPage(i) - 1); rendu(); }); });
     if (Number(c.arret) > 0) Lecteur.quand(c.arret, stopper);
     rendu();
   }
@@ -1001,12 +999,7 @@ function creerParoles() {
   }
   function debutPage(i) { let n = 0; for (let k = 0; k < i; k++) n += paras[k].texte.split('\n').length; return n; }
   function allerPage(v) { vus = Math.max(vus, v); off = Math.max(0, debutPage(v - 1) - 1); rendu(); }   // garde la dernière ligne
-  // N : début du paragraphe suivant (en gardant la dernière ligne)
-  J.suivant = () => {
-    if (idx < 0 || !zoneTexte || !paras.length) return;
-    if (!vus) return allerPage(1);
-    for (let i = 1; i < paras.length; i++) { const d = debutPage(i) - 1; if (d > off) { off = d; return rendu(); } }
-  };
+
   // ↓ ↑ : une seule ligne à chaque appui
   J.ligne = d => {
     if (idx < 0 || !zoneTexte || !paras.length) return;
@@ -1125,7 +1118,6 @@ function creerKaraoke() {
     if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages));
     return box;
   }
-  J.suivant = () => { if (idx >= 0 && zoneTexte && page < nbPages - 1) { cible = page + 1; rendu(); } };
   J.ligne = d => { if (idx < 0 || !zoneTexte || !nbLignes) return; off = Math.max(0, Math.min(nbLignes - 1, off + d)); rendu(); };
   function rendu() {
     const c = cur; zoneTexte.innerHTML = ''; zoneCmd.innerHTML = ''; zoneEtat.innerHTML = '';
@@ -1138,9 +1130,8 @@ function creerKaraoke() {
     if (phase === 'pret') zoneCmd.append(h('span', { class: 'note' }, 'au même moment que la musique'));
     if (phase === 'lecture' || phase === 'retour') zoneCmd.append(h('button', { class: 'btn gros', onclick: couper }, Lecteur.virt ? '🎤 À vous de chanter' : '🔇 Couper le son'));
     if (phase === 'coupure') zoneCmd.append(h('button', { class: 'btn gros', onclick: retablir }, Lecteur.virt ? '⏭ Fin du passage' : '🔊 Remettre le son'));
-    if (page < nbPages - 1) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => J.suivant() }, 'Paroles suivantes ▼', h('kbd', {}, 'N')));
     if (!revele && trou.total) zoneCmd.append(h('button', { class: 'btn gros', onclick: reveler }, '👀 Révéler les mots'));
-    if (revele) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { trou = preparerTrou(cur); revele = false; cible = 0; rendu(); } }, '🎲 Autres mots cachés'));
+    if (revele) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { trou = preparerTrou(cur); revele = false; rendu(); } }, '🎲 Autres mots cachés'));
   }
   async function lancer() {
     const c = cur;
@@ -1152,7 +1143,7 @@ function creerKaraoke() {
     const c = cur;
     if (!Lecteur.virt) { if (audio.paused && audio.src) audio.play().catch(() => {}); audio.muted = true; }
     else if (!Lecteur.enCours()) Lecteur.reprendre();
-    phase = 'coupure'; cible = pageTrou;
+    phase = 'coupure';
     finCoupure = Lecteur.temps() + (Number(c.duree) || 8);
     Lecteur.veilles = []; Lecteur.quand(finCoupure, retablir); rendu();
   }
@@ -1515,7 +1506,6 @@ document.addEventListener('keydown', e => {
   else if (k === 'b') { buzz.ouvert = !buzz.ouvert; majBuzz(); }
   else if (k === 'v') bonneReponse();
   else if (k === 'x') mauvaiseReponse();
-  else if (k === 'n' && jeuCourant && jeuCourant.suivant) jeuCourant.suivant();
   else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && jeuCourant && jeuCourant.ligne) { e.preventDefault(); jeuCourant.ligne(e.key === 'ArrowDown' ? 1 : -1); }
   else if (e.key === 'ArrowRight' && jeuCourant && jeuCourant.nav) jeuCourant.nav(1);
   else if (e.key === 'ArrowLeft' && jeuCourant && jeuCourant.nav) jeuCourant.nav(-1);
