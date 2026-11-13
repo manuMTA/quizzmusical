@@ -223,7 +223,7 @@ body.jeu-paroles #jeu .carte { overflow: hidden !important; }
 body.jeu-paroles #chrono-paroles.actif { display: block; }
 .paroles-vue { height: calc(5 * 34px * 1.45); overflow: hidden; font-family: var(--titre); font-weight: 400; text-align: center; flex-shrink: 0; }
 .paroles-defile { will-change: transform; }
-.paroles-defile > div { font-size: 34px; line-height: 1.45; color: #9a98b8; transition: color .5s ease; }
+.paroles-defile > div { font-size: 34px; line-height: 1.45; color: #f2f1ff; }
 .paroles-defile > div.actuelle, .ligne-actuelle { font-weight: 800; color: #ff9a1f; }
 #logo { cursor: pointer; }
 #accueil { position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 34px; padding: 30px;
@@ -300,7 +300,7 @@ body.jeu-paroles #chrono-paroles.actif { display: block; }
     A : écran d'accueil (les 5 jeux)<br>
     R : réarmer · B : ouvrir/fermer<br>
     V : bonne réponse · X : mauvaise<br>
-    ↑ ↓ : ligne suivante / précédente en gras (jeux 2 et 4)<br>
+    ↑ ↓ : 5 lignes suivantes / précédentes (jeux 2 et 4)<br>
     ← → : chanson précédente / suivante<br>
     1 à 9 : +1 point à l'équipe n°<br>
     Maj + 1 à 9 : −1 point
@@ -969,7 +969,7 @@ function creerParoles() {
       off = Math.max(0, Math.min(off, lignes.length - 1));
       // toutes les lignes dans une « fenêtre » : le texte glisse vers le haut, sans changer de taille
       const vue = h('div', { class: 'paroles-vue' }), contenu = h('div', { class: 'paroles-defile' });
-      lignes.forEach((l, k) => contenu.append(h('div', { class: k === actuelle ? 'actuelle' : '' }, l || '\u00a0')));   // la ligne à chanter est en gras
+      lignes.forEach(l => contenu.append(h('div', {}, l || '\u00a0')));
       vue.append(contenu); zoneTexte.append(vue);
       const haut = i => (contenu.children[Math.min(i, contenu.children.length - 1)] || { offsetTop: 0 }).offsetTop;
       contenu.style.transition = 'none'; contenu.style.transform = 'translateY(' + (-haut(offPrec)) + 'px)';
@@ -1003,16 +1003,15 @@ function creerParoles() {
   function debutPage(i) { let n = 0; for (let k = 0; k < i; k++) n += paras[k].texte.split('\n').length; return n; }
   function allerPage(v) { vus = Math.max(vus, v); off = Math.max(0, debutPage(v - 1) - 1); rendu(); }   // garde la dernière ligne
 
-  // ↓ ↑ : une seule ligne à chaque appui
+  // ↓ ↑ : écran suivant / précédent (5 lignes par écran)
   J.ligne = d => {
     if (idx < 0 || !zoneTexte || !paras.length) return;
-    if (!vus) { vus = paras.length; off = 0; actuelle = 0; return rendu(); }
-    const n = lignesVues().lignes.length;
-    // principe du karaoké : la ligne en gras descend jusqu'à la 3e ligne de l'écran, ensuite c'est le texte qui remonte
-    actuelle = Math.max(0, Math.min(n - 1, actuelle + (d > 0 ? 1 : -1)));
-    off = Math.max(0, actuelle - 2);
+    if (!vus) { vus = paras.length; off = 0; return rendu(); }
+    const n = lignesVues().lignes.length, dernier = Math.floor((n - 1) / FENETRE) * FENETRE;
+    off = Math.max(0, Math.min(dernier, off + (d > 0 ? FENETRE : -FENETRE)));
     rendu();
   };
+
 
   J.surBonne = () => { if (idx >= 0) reveler(); };
   J.nav = d => { if (!L().length) return; idx = idx < 0 ? 0 : (idx + d + L().length) % L().length; phase = 'pret'; afficher(); };
@@ -1118,7 +1117,7 @@ function creerKaraoke() {
     // fenêtre de lignes visibles ; les lignes d'avant la page en cours sont estompées
     // toutes les lignes dans une fenêtre de 5 lignes qui glisse doucement
     const vue = h('div', { class: 'paroles-vue' }), contenu = h('div', { class: 'paroles-defile' });
-    plat.forEach((l, k) => { const d = h('div', { class: k === actuelle ? 'actuelle' : '' }); l.forEach(n => d.append(n)); contenu.append(d); });
+    plat.forEach(l => { const d = h('div'); l.forEach(n => d.append(n)); contenu.append(d); });
     vue.append(contenu); box.append(vue);
     const trouVisible = plat.slice(off, off + FENETRE).some(l => l.some(n => n.dataset && n.dataset.trou));
     if (!revele && trouVisible) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
@@ -1126,7 +1125,8 @@ function creerKaraoke() {
     return box;
   }
   // principe du karaoké : la ligne en gras descend jusqu'à la 3e ligne de l'écran, ensuite c'est le texte qui remonte
-  J.ligne = d => { if (idx < 0 || !zoneTexte || !nbLignes) return; actuelle = Math.max(0, Math.min(nbLignes - 1, actuelle + d)); off = Math.max(0, actuelle - 2); rendu(); };
+  // ↓ ↑ : écran suivant / précédent (5 lignes par écran)
+  J.ligne = d => { if (idx < 0 || !zoneTexte || !nbLignes) return; const dernier = Math.floor((nbLignes - 1) / FENETRE) * FENETRE; off = Math.max(0, Math.min(dernier, off + (d > 0 ? FENETRE : -FENETRE))); rendu(); };
   function rendu() {
     const c = cur; zoneTexte.innerHTML = ''; zoneCmd.innerHTML = ''; zoneEtat.innerHTML = '';
     zoneTexte.classList.toggle('karaoke-coupure', phase === 'coupure');
