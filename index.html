@@ -221,8 +221,9 @@ body.jeu-paroles #jeu { overflow: hidden; }
 body.jeu-paroles #jeu .carte { overflow: hidden !important; }
 #chrono-paroles { display: none; position: absolute; right: 22px; bottom: 14px; font-size: 14px; color: var(--doux); background: rgba(9,8,22,.7); padding: 4px 10px; border-radius: 8px; }
 body.jeu-paroles #chrono-paroles.actif { display: block; }
-.paroles-vue { height: calc(7 * 1.45em); overflow: hidden; font-size: 30px; font-family: var(--titre); font-weight: 500; text-align: center; flex-shrink: 0; }
-.paroles-defile > div { line-height: 1.45; }
+.paroles-vue { height: calc(3 * 26px * 1.45 + 4 * 40px * 1.45 + 6px); overflow: hidden; font-family: var(--titre); font-weight: 500; text-align: center; flex-shrink: 0; }
+.paroles-defile > div { font-size: 26px; line-height: 1.45; transition: font-size .35s ease; }
+.paroles-defile > div.grosse { font-size: 40px; font-weight: 600; }
 #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #2a2458; border: 1px solid #5a4aa8; padding: 10px 18px; border-radius: 12px; z-index: 99; display: none; max-width: 80vw; }
 #toast.vu { display: block; animation: descend .2s; }
 #fin-manche { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 40; background: rgba(4,3,12,.7); }
@@ -950,7 +951,9 @@ function creerParoles() {
       off = Math.max(0, Math.min(off, lignes.length - 1));
       // toutes les lignes dans une « fenêtre » : le texte glisse vers le haut, sans changer de taille
       const vue = h('div', { class: 'paroles-vue' }), contenu = h('div', { class: 'paroles-defile' });
-      lignes.forEach((l, k) => contenu.append(h('div', { style: k < debut ? 'opacity:.45' : '' }, l || '\u00a0')));
+      // les 4 dernières lignes visibles sont toujours en gros, les premières en plus petit
+      const finVue = Math.min(off + FENETRE, lignes.length), debutGros = Math.max(off, finVue - 4);
+      lignes.forEach((l, k) => contenu.append(h('div', { class: k >= debutGros && k < finVue ? 'grosse' : '', style: k < debut ? 'opacity:.45' : '' }, l || '\u00a0')));
       vue.append(contenu); zoneTexte.append(vue);
       const haut = i => (contenu.children[Math.min(i, contenu.children.length - 1)] || { offsetTop: 0 }).offsetTop;
       contenu.style.transition = 'none'; contenu.style.transform = 'translateY(' + (-haut(offPrec)) + 'px)';
