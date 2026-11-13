@@ -222,8 +222,9 @@ body.jeu-paroles #jeu .carte { overflow: hidden !important; }
 #chrono-paroles { display: none; position: absolute; right: 22px; bottom: 14px; font-size: 14px; color: var(--doux); background: rgba(9,8,22,.7); padding: 4px 10px; border-radius: 8px; }
 body.jeu-paroles #chrono-paroles.actif { display: block; }
 .paroles-vue { height: calc(7 * 34px * 1.45); overflow: hidden; font-family: var(--titre); font-weight: 400; text-align: center; flex-shrink: 0; }
-.paroles-defile > div { font-size: 34px; line-height: 1.45; }
-.paroles-defile > div.actuelle, .ligne-actuelle { font-weight: 800; }
+.paroles-defile > div { font-size: 34px; line-height: 1.45; color: #9a98b8; transition: color .2s; }
+.paroles-defile > div.actuelle, .ligne-actuelle { font-weight: 800; color: #ff9a1f; }
+#logo { cursor: pointer; }
 #accueil { position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 34px; padding: 30px;
   background: radial-gradient(ellipse at 50% 0%, #2a1d6b 0%, #120f33 45%, var(--fond) 80%); }
 #accueil.vu { display: flex; }
@@ -1116,7 +1117,7 @@ function creerKaraoke() {
     // fenêtre de lignes visibles ; les lignes d'avant la page en cours sont estompées
     const ligne = (l, style) => { const d = h('div', { style }); l.forEach(n => d.append(n)); return d; };
     let trouVisible = false;
-    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; const el = ligne(l, 'font-weight:' + (off + k === actuelle ? 800 : 400)); box.append(el); });
+    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; const el = ligne(l, off + k === actuelle ? 'font-weight:800;color:#ff9a1f' : 'font-weight:400;color:#9a98b8'); box.append(el); });
     if (!revele && trouVisible) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
     if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages));
     return box;
@@ -1363,6 +1364,8 @@ function afficherAccueil() {
 }
 function fermerAccueil() { $('#accueil').classList.remove('vu'); }
 $('#btn-accueil').onclick = afficherAccueil;
+$('#logo').onclick = afficherAccueil;
+$('#logo').title = 'Écran d’accueil';
 
 // =====================================================================
 //  Fenêtre « Équipes »
