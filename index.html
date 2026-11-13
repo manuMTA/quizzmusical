@@ -216,6 +216,11 @@ kbd { font-size: 11px; background: rgba(255,255,255,.12); border-radius: 4px; pa
 .mini { padding: 4px 9px; font-size: 13px; border-radius: 8px; }
 .note { font-size: 13px; color: var(--doux); }
 
+body.jeu-paroles #lecteur { display: none; }
+body.jeu-paroles #jeu { overflow: hidden; }
+body.jeu-paroles #jeu .carte { overflow: hidden !important; }
+#chrono-paroles { display: none; position: absolute; right: 22px; bottom: 14px; font-size: 14px; color: var(--doux); background: rgba(9,8,22,.7); padding: 4px 10px; border-radius: 8px; }
+body.jeu-paroles #chrono-paroles.actif { display: block; }
 #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #2a2458; border: 1px solid #5a4aa8; padding: 10px 18px; border-radius: 12px; z-index: 99; display: none; max-width: 80vw; }
 #toast.vu { display: block; animation: descend .2s; }
 #fin-manche { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 40; background: rgba(4,3,12,.7); }
@@ -264,6 +269,7 @@ kbd { font-size: 11px; background: rgba(255,255,255,.12); border-radius: 4px; pa
     <label title="Met la musique en pause dès qu'une équipe buzze"><input type="checkbox" id="pause-auto" checked> Pause au buzz</label>
   </div>
   <div id="flash"></div>
+  <div id="chrono-paroles"></div>
 </main>
 
 <aside id="scores">
@@ -703,6 +709,8 @@ function boucle() {
   if (!glisse && audio.duration && !Lecteur.virt) $('#progression').value = Math.round(t / audio.duration * 1000);
   $('#temps').textContent = (Lecteur.virt ? '⏱ ' : '') + fmt(t); $('#duree').textContent = Lecteur.virt ? 'sans son' : fmt(audio.duration);
   $('#btn-lecture').textContent = Lecteur.enCours() ? '⏸' : '▶';
+  const cp = $('#chrono-paroles'); const actif = !!(Lecteur.virt || audio.src) && (Lecteur.virt || !audio.paused || t > 0);
+  cp.classList.toggle('actif', actif); if (actif) cp.textContent = '⏱ ' + fmt(t) + (Lecteur.enCours() ? '' : ' (pause)');
   requestAnimationFrame(boucle);
 }
 $('#progression').addEventListener('input', () => { glisse = true; });
@@ -915,7 +923,7 @@ function creerParoles() {
     racine.append(h('div', { class: 'entete-jeu' },
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🎤 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
-    zoneTexte = h('div', { class: 'carte', style: 'flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:18px;min-height:260px;overflow:auto' });
+    zoneTexte = h('div', { class: 'carte', style: 'flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;min-height:260px;overflow:hidden' });
     zoneCmd = h('div', { class: 'commandes' });
     racine.append(zoneTexte, zoneCmd); rendu();
   }
@@ -1048,7 +1056,7 @@ function creerKaraoke() {
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🥁 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
     zoneEtat = h('div', { class: 'reponse', style: 'min-height:56px' });
-    zoneTexte = h('div', { class: 'carte', style: 'flex:1;overflow:auto;min-height:240px' });
+    zoneTexte = h('div', { class: 'carte', style: 'flex:1;overflow:hidden;min-height:240px;display:flex;flex-direction:column;justify-content:center' });
     zoneCmd = h('div', { class: 'commandes' });
     racine.append(zoneEtat, zoneTexte, zoneCmd); rendu();
   }
@@ -1084,7 +1092,7 @@ function creerKaraoke() {
     let trouVisible = false;
     plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; box.append(ligne(l, off + k < debuts[page] ? 'opacity:.4;font-size:22px' : '')); });
     if (!revele && trouVisible) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
-    if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages + ' · ↑ ↓ ligne par ligne'));
+    if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages));
     return box;
   }
   J.suivant = () => { if (idx >= 0 && zoneTexte && page < nbPages - 1) { cible = page + 1; rendu(); } };
@@ -1311,6 +1319,7 @@ function choisirJeu(id) {
   Lecteur.stop();
   jeuCourant = JEUX.find(j => j.id === id) || JEUX[0];
   ecrire('quiz-jeu', jeuCourant.id);
+  document.body.classList.toggle('jeu-paroles', jeuCourant.id === 'paroles' || jeuCourant.id === 'karaoke');
   $('#jeu').innerHTML = '';
   jeuCourant.ouvrir($('#jeu'));
   renduCategories();
