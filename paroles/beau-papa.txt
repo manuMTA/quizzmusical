@@ -1,0 +1,67 @@
+# Beau-papa — Vianney
+# Utilisé dans : Jeu 2 – Terminer les paroles (n° 5) ; Jeu 4 – Karaoké (n° 13)
+# Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
+# Ligne vide = nouveau paragraphe.
+# Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
+#   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
+# Karaoké : le texte entier est affiché, 7 ou 8 mots cachés vers le 50e mot ([STOP] et les temps sont ignorés).
+J'avais pas prévu
+D'un jour adopter
+Mon enfant j'ai du
+Surtout m'adapter
+Y'a pas que les gènes
+Qui font les familles
+Des humains qui s'aiment
+Suffisent
+Et si l'averse
+Nous touche toi et moi
+On la traverse à deux à trois
+Et si l'averse
+Nous touche toi et moi
+Prends ma main de beau-papa
+J'attendais pas
+J'te laisserai pas
+Même sans l'même sang
+On s'aimera
+Non je ne volerai jamais la place
+Du premier qui t'a dit je t'aime
+Sur ton visage on voit son visage
+Et c'est ainsi que tu es belle
+De vous à moi
+C'est moi j'avoue
+Qui me suis invité
+Dans sa vie là
+Dans la vie où
+Elle n'a rien demandé
+Et si l'averse
+Nous touche toi et moi
+On la traverse à deux à trois
+Et si l'averse
+Nous touche toi et moi
+Prends ma main de beau-papa
+J'attendais pas
+J'te laisserai pas
+Même sans l'même sang
+On s'aimera
+On s'aimera
+J'avais pas prévu
+D'un jour adopter
+En vérité nue
+C'est toi qui l'a fait
+Y'a pas que les gènes
+Qui font les familles
+Du moment qu'on s'aime
+Et si l'averse
+Nous touche toi et moi
+On la traverse à deux à trois
+Et si l'averse
+Nous touche toi et moi
+Prends ma main
+Dis
+Prends-là
+J'attendais pas
+J'te laisserai pas
+Même sans l'même sang
+On s'aimera
+Même sans l'même sang
+On s'aimera

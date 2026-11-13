@@ -1,0 +1,6 @@
+# Je te donne — Jean-Jacques Goldman et Michael Jones
+# Utilisé dans : Jeu 4 – Karaoké (n° 4)
+# Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
+# Ligne vide = nouveau paragraphe.
+# Karaoké : le texte entier est affiché, 7 ou 8 mots cachés vers le 50e mot ([STOP] et les temps sont ignorés).
+

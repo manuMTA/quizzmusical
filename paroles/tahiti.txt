@@ -1,0 +1,7 @@
+# Tahiti — Keen'V
+# Utilisé dans : Jeu 2 – Terminer les paroles (n° 4)
+# Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
+# Ligne vide = nouveau paragraphe.
+# Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
+#   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
+
