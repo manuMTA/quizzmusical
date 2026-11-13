@@ -274,7 +274,7 @@ kbd { font-size: 11px; background: rgba(255,255,255,.12); border-radius: 4px; pa
     Espace : lecture / pause<br>
     R : réarmer · B : ouvrir/fermer<br>
     V : bonne réponse · X : mauvaise<br>
-    N : paroles suivantes (jeux 2 et 4)<br>
+    N : paroles suivantes · ↑ ↓ : une ligne (jeux 2 et 4)<br>
     ← → : chanson précédente / suivante<br>
     1 à 9 : +1 point à l'équipe n°<br>
     Maj + 1 à 9 : −1 point
@@ -361,7 +361,7 @@ document.querySelectorAll('[data-fermer]').forEach(b => b.onclick = () => fermer
 //  Configuration des jeux (modifiable dans « Préparer »)
 // =====================================================================
 const CONFIG_DEFAUT = {
-  nuage: { version: 4, intervalle: 3, aleatoire: false, chansons_aleatoires: true, chansons: [{"titre": "Le Jerk", "artiste": "Thierry Hazard", "fichier": "", "debut": 0, "mots": "1990\ndanse\nannées 60\nTop 50\nrétro\nchanteur"}, {"titre": "Aïcha", "artiste": "Khaled", "fichier": "", "debut": 0, "mots": "1996\nraï\nAlgérie\nprénom\ndéclaration\nJean-Jacques Goldman"}, {"titre": "Caroline", "artiste": "MC Solaar", "fichier": "", "debut": 0, "mots": "1991\nrap\njazz\nrupture\nprénom\nQui sème le vent récolte le tempo"}, {"titre": "Allumer le feu", "artiste": "Johnny Hallyday", "fichier": "", "debut": 0, "mots": "1998\nrock\nconcert\nStade de France\nflammes\nPascal Obispo"}, {"titre": "Au soleil", "artiste": "Jenifer", "fichier": "", "debut": 0, "mots": "2004\nchanteuse\nété\nvacances\nplage\nStar Academy"}, {"titre": "La Boulette", "artiste": "Diam's", "fichier": "", "debut": 0, "mots": "2006\nrap\njeunesse\ncolère\ngénération\nDans ma bulle"}, {"titre": "Ma philosophie", "artiste": "Amel Bent", "fichier": "", "debut": 0, "mots": "2004\nNouvelle Star\nR&B\nconfiance\ndifférence\nhymne"}, {"titre": "Parle à ma main", "artiste": "Fatal Bazooka feat. Yelle", "fichier": "", "debut": 0, "mots": "2007\nparodie\nélectro\ngeste\nringard\nMichaël Youn"}, {"titre": "Le temps", "artiste": "Tayc", "fichier": "", "debut": 0, "mots": "2021\nR&B\nafrolove\nchanteur\nslow\nFleur froide"}, {"titre": "Sous le vent", "artiste": "Garou et Céline Dion", "fichier": "", "debut": 0, "mots": "2000\nduo\nQuébec\nvoile\nmer\nnavigation"}, {"titre": "La Tribu de Dana", "artiste": "Manau", "fichier": "", "debut": 0, "mots": "1998\nrap celtique\nBretagne\ndruides\nguerriers\nbataille"}, {"titre": "Sapés comme jamais", "artiste": "Maître Gims feat. Niska", "fichier": "", "debut": 0, "mots": "2015\nrap\nmode\nélégance\nsoirée\nMon cœur avait raison"}, {"titre": "Ciel", "artiste": "Gims", "fichier": "", "debut": 0, "mots": "2019\nrap\nchanteur\nlunettes noires\nCeinture noire\nSexion d'Assaut"}, {"titre": "Balance ton quoi", "artiste": "Angèle", "fichier": "", "debut": 0, "mots": "2018\nBelgique\nféminisme\nsexisme\n#MeToo\nBrol"}] },
+  nuage: { version: 4, max_mots: 20, depuis_paroles: true, intervalle: 3, aleatoire: false, chansons_aleatoires: true, chansons: [{"titre": "Le Jerk", "artiste": "Thierry Hazard", "fichier": "", "debut": 0, "mots": "1990\ndanse\nannées 60\nTop 50\nrétro\nchanteur"}, {"titre": "Aïcha", "artiste": "Khaled", "fichier": "", "debut": 0, "mots": "1996\nraï\nAlgérie\nprénom\ndéclaration\nJean-Jacques Goldman"}, {"titre": "Caroline", "artiste": "MC Solaar", "fichier": "", "debut": 0, "mots": "1991\nrap\njazz\nrupture\nprénom\nQui sème le vent récolte le tempo"}, {"titre": "Allumer le feu", "artiste": "Johnny Hallyday", "fichier": "", "debut": 0, "mots": "1998\nrock\nconcert\nStade de France\nflammes\nPascal Obispo"}, {"titre": "Au soleil", "artiste": "Jenifer", "fichier": "", "debut": 0, "mots": "2004\nchanteuse\nété\nvacances\nplage\nStar Academy"}, {"titre": "La Boulette", "artiste": "Diam's", "fichier": "", "debut": 0, "mots": "2006\nrap\njeunesse\ncolère\ngénération\nDans ma bulle"}, {"titre": "Ma philosophie", "artiste": "Amel Bent", "fichier": "", "debut": 0, "mots": "2004\nNouvelle Star\nR&B\nconfiance\ndifférence\nhymne"}, {"titre": "Parle à ma main", "artiste": "Fatal Bazooka feat. Yelle", "fichier": "", "debut": 0, "mots": "2007\nparodie\nélectro\ngeste\nringard\nMichaël Youn"}, {"titre": "Le temps", "artiste": "Tayc", "fichier": "", "debut": 0, "mots": "2021\nR&B\nafrolove\nchanteur\nslow\nFleur froide"}, {"titre": "Sous le vent", "artiste": "Garou et Céline Dion", "fichier": "", "debut": 0, "mots": "2000\nduo\nQuébec\nvoile\nmer\nnavigation"}, {"titre": "La Tribu de Dana", "artiste": "Manau", "fichier": "", "debut": 0, "mots": "1998\nrap celtique\nBretagne\ndruides\nguerriers\nbataille"}, {"titre": "Sapés comme jamais", "artiste": "Maître Gims feat. Niska", "fichier": "", "debut": 0, "mots": "2015\nrap\nmode\nélégance\nsoirée\nMon cœur avait raison"}, {"titre": "Ciel", "artiste": "Gims", "fichier": "", "debut": 0, "mots": "2019\nrap\nchanteur\nlunettes noires\nCeinture noire\nSexion d'Assaut"}, {"titre": "Balance ton quoi", "artiste": "Angèle", "fichier": "", "debut": 0, "mots": "2018\nBelgique\nféminisme\nsexisme\n#MeToo\nBrol"}] },
   paroles: { version: 2, chansons: [{"titre": "Melodrama", "artiste": "Disiz et Theodora", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Clic clic pan pan", "artiste": "Yanns", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Et bam", "artiste": "Mentissa", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Tahiti", "artiste": "Keen'V", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Beau-papa", "artiste": "Vianney", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Je t'emmène au vent", "artiste": "Louise Attaque", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Tu m'oublieras", "artiste": "Larusso", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Je danse le Mia", "artiste": "IAM", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}, {"titre": "Tomber la chemise", "artiste": "Zebda", "fichier": "", "debut": 0, "paragraphes": "", "arret": 0, "reponse": ""}] },
   blindtest: { chansons: [ { titre: 'Extrait 1', artiste: '', fichier: '', debut: 0 } ] },
   karaoke: { version: 2, chansons: [{"titre": "Les Lacs du Connemara", "artiste": "Michel Sardou", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Les Champs-Élysées", "artiste": "Joe Dassin", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Santiano", "artiste": "Hugues Aufray", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Je te donne", "artiste": "Jean-Jacques Goldman et Michael Jones", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Mexico", "artiste": "Luis Mariano", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Petite Marie", "artiste": "Francis Cabrel", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "La même", "artiste": "Gims et Vianney", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Dommage", "artiste": "Bigflo & Oli", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Moi... Lolita", "artiste": "Alizée", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "En feu", "artiste": "Soprano", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Melodrama", "artiste": "Disiz et Theodora", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Coco", "artiste": "Wejdene", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}, {"titre": "Beau-papa", "artiste": "Vianney", "fichier": "", "debut": 0, "paroles": "", "trou_debut": 50, "trou_nb": 0, "coupure": 0, "duree": 8}] },
@@ -369,6 +369,8 @@ const CONFIG_DEFAUT = {
 };
 let CONFIG = lire('quiz-config', null) || JSON.parse(JSON.stringify(CONFIG_DEFAUT));
 for (const k of Object.keys(CONFIG_DEFAUT)) if (!CONFIG[k]) CONFIG[k] = JSON.parse(JSON.stringify(CONFIG_DEFAUT[k]));
+if (CONFIG.nuage.max_mots == null) CONFIG.nuage.max_mots = 20;
+if (CONFIG.nuage.depuis_paroles == null) CONFIG.nuage.depuis_paroles = true;
 // Mise à jour du karaoké : nouvelle liste de chansons (une chanson déjà préparée sous le même titre garde vos réglages)
 if ((CONFIG.karaoke.version || 1) < CONFIG_DEFAUT.karaoke.version) {
   const t = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
@@ -727,6 +729,25 @@ const vide = () => h('div', { class: 'vide carte' }, 'Rien à jouer pour l’ins
 const blocReponse = c => h('div', { class: 'reponse apparait' }, h('div', { class: 't' }, '« ' + (c.titre || '?') + ' »'), c.artiste ? h('div', { class: 'a' }, c.artiste) : null);
 
 // ---------------- 1. Nuage de mots ----------------
+// Choisit jusqu'à N mots dans les paroles (fichier paroles/<titre>.txt), sans les mots du titre ni de l'artiste.
+// Les mots rares apparaissent d'abord (plus difficile), les plus fréquents (refrain) à la fin et en plus gros.
+const MOTS_VIDES = new Set(('le la les l de des du d un une et a au aux en dans sur sous par pour avec sans je j tu il elle on nous vous ils elles me m te t se s ' +
+  'ma ta sa mon ton son mes tes ses nos vos leur leurs ce c cet cette ces ca qui que qu quoi dont ou ne n pas plus moins y est es suis sont ai as avons avez ont ' +
+  'etait etre avoir fait mais donc or ni car si comme tout tous toute toutes moi toi lui eux oui non oh ah eh hey yeah yeah la na lalala ouh baby').split(' '));
+function choisirMotsNuage(texte, c, max) {
+  const n = x => String(x || '').toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const interdits = new Set(n(c.titre + ' ' + c.artiste).split(/[^a-z0-9]+/).filter(Boolean));
+  const vus = new Map();
+  for (const brut of String(texte).replace(/\[[^\]]*\]/g, ' ').split(/[^\p{L}\p{N}]+/u)) {
+    const k = n(brut);
+    if (k.length < 3 || MOTS_VIDES.has(k) || interdits.has(k) || /^\d+$/.test(k)) continue;
+    const e = vus.get(k); if (e) e.f++; else vus.set(k, { mot: brut.toLowerCase(), f: 1 });
+  }
+  let liste = melanger([...vus.values()]).sort((a, b) => b.f - a.f).slice(0, max);  // les plus marquants
+  liste = melanger(liste).sort((a, b) => a.f - b.f);                                  // rares d'abord
+  const fmax = Math.max(1, ...liste.map(x => x.f));
+  return liste.map(x => ({ mot: x.mot, poids: x.f / fmax }));
+}
 function creerNuage() {
   const J = { id: 'nuage', nom: 'Nuage de mots', icone: '☁️' };
   let idx = 0, racine, zone, zoneRep, timer = null, reprise = false, mots = [], n = 0, places = [], btnLancer, compteur;
@@ -741,13 +762,22 @@ function creerNuage() {
   const PALETTE = ['#ff6fb5', '#9d8bff', '#4fd1ff', '#ffd166', '#7cf29c', '#ff9f5a', '#f5f3ff', '#c38bff'];
   J.ouvrir = el => { racine = el; idx = Math.min(idx, Math.max(0, L().length - 1)); afficher(); };
   J.quitter = () => arreter();
-  function afficher() {
+  async function afficher() {
     arreter(); racine.innerHTML = '';
+    const nAff = idx, c0 = L()[idx];
+    const txt = c0 && CONFIG.nuage.depuis_paroles !== false ? await FichiersParoles.lire(c0.titre) : '';
+    if (nAff !== idx) return;
+    racine.innerHTML = '';
     racine.append(enTete('☁️ Nuage de mots', L(), idx, i => { idx = i; afficher(); }, faits, ordre.map(i => i + 1)));
     const c = L()[idx]; if (!c) { racine.append(vide()); return; }
     racine.append(h('div', {}, h('span', { class: 'num-chanson' }, 'Chanson n° ' + (ordre[idx] + 1))));
-    mots = String(c.mots || '').split(/\n|,/).map(s => s.trim()).filter(Boolean);
-    if (CONFIG.nuage.aleatoire) mots = melanger(mots);
+    const max = Math.max(1, Number(CONFIG.nuage.max_mots) || 20);
+    if (txt) mots = choisirMotsNuage(txt, c, max);
+    else {
+      mots = String(c.mots || '').split(/\n|,/).map(s => s.trim()).filter(Boolean).slice(0, max).map(m => ({ mot: m, poids: null }));
+      if (CONFIG.nuage.aleatoire) mots = melanger(mots);
+    }
+    if (!mots.length) { racine.append(h('div', { class: 'vide carte' }, 'Pas de mots pour cette chanson : ajoutez ses paroles dans le fichier ', h('b', {}, 'paroles/' + nomFichierParoles(c.titre)), ' ou des mots dans ✏️ Préparer.')); return; }
     n = 0; places = [];
     zone = h('div', { class: 'nuage' });
     zoneRep = h('div', { style: 'min-height:90px' });
@@ -765,12 +795,12 @@ function creerNuage() {
   function arreter() { clearInterval(timer); timer = null; majCompteur(); }
   function motSuivant() { if (n >= mots.length) { arreter(); return; } placer(mots[n++]); if (n >= mots.length) arreter(); majCompteur(); }
   function chevauche(a, b) { const m = 8; return !(a.x + a.w + m < b.x || b.x + b.w + m < a.x || a.y + a.h + m < b.y || b.y + b.h + m < a.y); }
-  function placer(mot) {
-    const W = zone.clientWidth, H = zone.clientHeight;
+  function placer(m) {
+    const mot = m.mot, W = zone.clientWidth, H = zone.clientHeight;
     const s = h('span', { class: 'mot' }, mot);
     s.style.color = PALETTE[(n - 1) % PALETTE.length]; s.style.visibility = 'hidden';
     zone.append(s);
-    let taille = [30, 38, 46, 56, 68, 84][Math.floor(Math.random() * 6)];
+    let taille = m.poids == null ? [30, 38, 46, 56, 68, 84][Math.floor(Math.random() * 6)] : Math.round(28 + m.poids * 52 + Math.random() * 8);
     for (let essai = 0; essai < 7; essai++) {
       s.style.fontSize = taille + 'px';
       const w = s.offsetWidth, hh = s.offsetHeight, a0 = Math.random() * Math.PI * 2;
@@ -864,7 +894,8 @@ function paginer(paras) {
 }
 function creerParoles() {
   const J = { id: 'paroles', nom: 'Terminer les paroles', icone: '🎤' };
-  let idx = -1, racine, phase = 'pret', paras = [], vus = 0, zoneTexte, zoneCmd, cur = null;
+  let idx = -1, racine, phase = 'pret', paras = [], vus = 0, zoneTexte, zoneCmd, cur = null, off = 0;
+  const FENETRE = 7; // lignes affichées en même temps
   const faits = new Set();
   const L = () => CONFIG.paroles.chansons || [];
   J.ouvrir = el => { racine = el; if (idx >= L().length) idx = -1; idx < 0 ? afficherChoix() : afficher(); };
@@ -880,7 +911,7 @@ function creerParoles() {
     Lecteur.stop(); racine.innerHTML = '';
     const n = idx; const c = await FichiersParoles.pourParoles(L()[idx]); if (n !== idx) return;
     cur = c; racine.innerHTML = '';
-    paras = paginer(decouperParagraphes(c)); vus = 0;
+    paras = paginer(decouperParagraphes(c)); vus = 0; off = 0;
     racine.append(h('div', { class: 'entete-jeu' },
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🎤 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
@@ -902,8 +933,13 @@ function creerParoles() {
     const c = cur; zoneTexte.innerHTML = ''; zoneCmd.innerHTML = '';
     if (!paras.length && !c.reponse) zoneTexte.append(aucuneParole(c));
     else if (phase === 'pret' && !vus) zoneTexte.append(h('div', { class: 'grand-message', style: 'margin:auto' }, '🎤'), h('p', { class: 'note', style: 'text-align:center;margin:0 0 auto' }, 'Les paroles vont s’afficher… et la musique s’arrêtera : à vous de chanter la suite !'));
-    if (vus >= 2) { const prec = paras[vus - 2].texte.split('\n'); zoneTexte.append(h('div', { class: 'paroles-avant', style: 'opacity:.4;font-size:22px' }, prec[prec.length - 1])); }
-    if (vus >= 1) zoneTexte.append(h('div', { class: 'paroles-avant' }, paras[vus - 1].texte));
+    if (vus >= 1) {
+      const { lignes, debut } = lignesVues();
+      off = Math.max(0, Math.min(off, lignes.length - 1));
+      const box = h('div', { class: 'paroles-avant' });
+      lignes.slice(off, off + FENETRE).forEach((l, k) => box.append(h('div', { style: off + k < debut ? 'opacity:.4;font-size:22px' : '' }, l || '\u00a0')));
+      zoneTexte.append(box);
+    }
     if (phase === 'stop' || phase === 'revele') zoneTexte.append(trous(c.reponse, phase === 'revele'));
     zoneTexte.scrollTop = zoneTexte.scrollHeight;
     if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'), h('span', { class: 'note' }, 'au même moment que la musique'));
@@ -918,13 +954,30 @@ function creerParoles() {
     await Lecteur.lancerChanson(c);
     phase = 'lecture';
     if (paras.length && paras[0].t == null) vus = Math.max(vus, 1);
-    paras.forEach((p, i) => { if (p.t != null) Lecteur.quand(p.t, () => { if (vus <= i) { vus = i + 1; rendu(); } }); });
+    paras.forEach((p, i) => { if (p.t != null) Lecteur.quand(p.t, () => { if (vus <= i) allerPage(i + 1); }); });
     if (Number(c.arret) > 0) Lecteur.quand(c.arret, stopper);
     rendu();
   }
   function stopper() { Lecteur.pause(); Lecteur.veilles = []; phase = 'stop'; rendu(); sonner([660, 880], .12, 'triangle', .2); }
   function reveler() { if (phase === 'lecture') stopper(); phase = 'revele'; faits.add(idx); rendu(); }
-  J.suivant = () => { if (idx >= 0 && zoneTexte && vus < paras.length) { vus++; rendu(); } };
+  // toutes les lignes déjà affichées + début de la page en cours
+  function lignesVues() {
+    const lignes = []; let debut = 0;
+    paras.slice(0, vus).forEach((p, i) => { if (i === vus - 1) debut = lignes.length; lignes.push(...p.texte.split('\n')); });
+    return { lignes, debut };
+  }
+  function allerPage(v) { vus = v; off = Math.max(0, lignesVues().debut - 1); rendu(); }   // garde la dernière ligne
+  J.suivant = () => { if (idx >= 0 && zoneTexte && vus < paras.length) allerPage(vus + 1); };
+  J.ligne = d => {
+    if (idx < 0 || !zoneTexte || !paras.length) return;
+    if (d > 0) {
+      if (!vus) return allerPage(1);
+      const n = lignesVues().lignes.length;
+      if (off + FENETRE >= n && vus < paras.length) vus++;          // plus rien en dessous : on ajoute la suite
+      if (off < lignesVues().lignes.length - 1) off++;
+    } else off = Math.max(0, off - 1);
+    rendu();
+  };
   J.surBonne = () => { if (idx >= 0) reveler(); };
   J.nav = d => { if (!L().length) return; idx = idx < 0 ? 0 : (idx + d + L().length) % L().length; phase = 'pret'; afficher(); };
   return J;
@@ -973,7 +1026,8 @@ function preparerTrou(c) {
 }
 function creerKaraoke() {
   const J = { id: 'karaoke', nom: 'Karaoké – garde le rythme', icone: '🥁', pauseAuBuzz: false };
-  let idx = -1, racine, phase = 'pret', finCoupure = 0, trou = null, revele = false, zoneTexte, zoneEtat, zoneCmd, chrono, cur = null, page = 0, nbPages = 0, pageTrou = 0;
+  let idx = -1, racine, phase = 'pret', finCoupure = 0, trou = null, revele = false, zoneTexte, zoneEtat, zoneCmd, chrono, cur = null, page = 0, nbPages = 0, pageTrou = 0, off = 0, cible = 0, nbLignes = 0;
+  const FENETRE = 7;
   const faits = new Set();
   const L = () => CONFIG.karaoke.chansons || [];
   J.ouvrir = el => { racine = el; if (idx >= L().length) idx = -1; idx < 0 ? afficherChoix() : afficher(); };
@@ -989,7 +1043,7 @@ function creerKaraoke() {
   async function afficher() {
     Lecteur.stop(); racine.innerHTML = ''; phase = 'pret'; revele = false;
     const n = idx; const c = await FichiersParoles.pourKaraoke(L()[idx]); if (n !== idx) return;
-    cur = c; racine.innerHTML = ''; trou = preparerTrou(c); page = 0;
+    cur = c; racine.innerHTML = ''; trou = preparerTrou(c); page = 0; off = 0; cible = 0;
     racine.append(h('div', { class: 'entete-jeu' },
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🥁 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
@@ -1020,16 +1074,21 @@ function creerKaraoke() {
     for (const bl of blocs) { if (bl.length <= 6) pages.push(bl); else for (let i = 0; i < bl.length; i += 4) pages.push(bl.slice(i, i + 4)); }
     nbPages = pages.length;
     pageTrou = Math.max(0, pages.findIndex(pg => pg.some(l => l.some(n => n.dataset && n.dataset.trou))));
-    page = Math.min(page, nbPages - 1);
-    // 3. afficher la dernière ligne de la page précédente + la page en cours
+    const plat = pages.flat(), debuts = []; let acc = 0; pages.forEach(pg => { debuts.push(acc); acc += pg.length; });
+    nbLignes = plat.length;
+    if (cible != null) { off = Math.max(0, debuts[Math.min(cible, nbPages - 1)] - 1); cible = null; }   // saut de page : on garde la dernière ligne
+    off = Math.max(0, Math.min(off, nbLignes - 1));
+    page = 0; for (let p = 0; p < nbPages; p++) if (debuts[p] <= off + 1) page = p;
+    // fenêtre de lignes visibles ; les lignes d'avant la page en cours sont estompées
     const ligne = (l, style) => { const d = h('div', { style }); l.forEach(n => d.append(n)); return d; };
-    if (page > 0) { const prec = pages[page - 1]; box.append(ligne(prec[prec.length - 1], 'opacity:.4;font-size:22px;margin-bottom:10px')); }
-    pages[page].forEach(l => box.append(ligne(l, '')));
-    if (!revele && page === pageTrou) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
-    if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages));
+    let trouVisible = false;
+    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; box.append(ligne(l, off + k < debuts[page] ? 'opacity:.4;font-size:22px' : '')); });
+    if (!revele && trouVisible) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
+    if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages + ' · ↑ ↓ ligne par ligne'));
     return box;
   }
-  J.suivant = () => { if (idx >= 0 && zoneTexte && page < nbPages - 1) { page++; rendu(); } };
+  J.suivant = () => { if (idx >= 0 && zoneTexte && page < nbPages - 1) { cible = page + 1; rendu(); } };
+  J.ligne = d => { if (idx < 0 || !zoneTexte || !nbLignes) return; off = Math.max(0, Math.min(nbLignes - 1, off + d)); rendu(); };
   function rendu() {
     const c = cur; zoneTexte.innerHTML = ''; zoneCmd.innerHTML = ''; zoneEtat.innerHTML = '';
     zoneTexte.classList.toggle('karaoke-coupure', phase === 'coupure');
@@ -1043,7 +1102,7 @@ function creerKaraoke() {
     if (phase === 'coupure') zoneCmd.append(h('button', { class: 'btn gros', onclick: retablir }, Lecteur.virt ? '⏭ Fin du passage' : '🔊 Remettre le son'));
     if (page < nbPages - 1) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => J.suivant() }, 'Paroles suivantes ▼', h('kbd', {}, 'N')));
     if (!revele && trou.total) zoneCmd.append(h('button', { class: 'btn gros', onclick: reveler }, '👀 Révéler les mots'));
-    if (revele) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { trou = preparerTrou(cur); revele = false; page = 0; rendu(); } }, '🎲 Autres mots cachés'));
+    if (revele) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { trou = preparerTrou(cur); revele = false; cible = 0; rendu(); } }, '🎲 Autres mots cachés'));
   }
   async function lancer() {
     const c = cur;
@@ -1055,7 +1114,7 @@ function creerKaraoke() {
     const c = cur;
     if (!Lecteur.virt) { if (audio.paused && audio.src) audio.play().catch(() => {}); audio.muted = true; }
     else if (!Lecteur.enCours()) Lecteur.reprendre();
-    phase = 'coupure'; page = pageTrou;
+    phase = 'coupure'; cible = pageTrou;
     finCoupure = Lecteur.temps() + (Number(c.duree) || 8);
     Lecteur.veilles = []; Lecteur.quand(finCoupure, retablir); rendu();
   }
@@ -1290,8 +1349,8 @@ $('#btn-valider-equipes').onclick = () => {
 const C_TITRE = { k: 'titre', l: 'Titre (la réponse)', t: 'texte', c: 'demi' }, C_ART = { k: 'artiste', l: 'Artiste', t: 'texte', c: 'demi' };
 const C_FICH = { k: 'fichier', l: 'Fichier audio', t: 'fichier', c: 'demi' }, C_DEB = { k: 'debut', l: 'Départ (s)', t: 'temps' };
 const SCHEMA = {
-  nuage: { nom: '☁️ Nuage de mots', note: 'Les mots apparaissent un par un. À la révélation, la chanson se lance : le fichier choisi, ou à défaut un fichier du dossier musique dont le nom contient le titre.',
-    reglages: [{ k: 'intervalle', l: 'Secondes entre deux mots', t: 'nombre' }, { k: 'aleatoire', l: 'Mots dans un ordre aléatoire', t: 'case' }, { k: 'chansons_aleatoires', l: 'Chansons dans un ordre aléatoire', t: 'case' }],
+  nuage: { nom: '☁️ Nuage de mots', note: 'Jusqu’à 20 mots (réglable) sont pris automatiquement dans le fichier de paroles de la chanson (dossier « paroles » sur le serveur), sans les mots du titre ni de l’artiste ni les petits mots (le, de, je…). Les mots rares apparaissent d’abord, les plus répétés à la fin et en plus gros. Sans fichier, ce sont les mots saisis ci-dessous qui servent.',
+    reglages: [{ k: 'intervalle', l: 'Secondes entre deux mots', t: 'nombre' }, { k: 'max_mots', l: 'Nombre de mots maximum', t: 'nombre' }, { k: 'depuis_paroles', l: 'Prendre les mots dans le fichier de paroles', t: 'case' }, { k: 'aleatoire', l: 'Mots saisis ci-dessous dans un ordre aléatoire', t: 'case' }, { k: 'chansons_aleatoires', l: 'Chansons dans un ordre aléatoire', t: 'case' }],
     champs: [C_TITRE, C_ART, C_FICH, C_DEB, { k: 'mots', l: 'Mots du nuage (un par ligne, ou séparés par des virgules)', t: 'zone', c: 'large' }] },
   paroles: { nom: '🎤 Terminer les paroles', note: 'Laissez les paroles vides pour utiliser le fichier du dossier « paroles » sur le serveur (nom indiqué sous chaque chanson). Sinon, collez les paroles paragraphe par paragraphe, séparés par une ligne vide. Pour qu’un paragraphe s’affiche tout seul pendant la chanson, commencez-le par son temps, ex. [1:05] (bouton ⏱ = insérer le temps de l’écoute). La musique s’arrête au temps « Arrêt » et les « Paroles à trouver » s’affichent en cases vides.',
     champs: [C_TITRE, C_ART, C_FICH, C_DEB, { k: 'arret', l: 'Arrêt de la musique (s)', t: 'temps' }, { k: 'paragraphes', l: 'Paroles affichées, par paragraphe (ligne vide entre deux paragraphes)', t: 'zone-temps', c: 'large' }, { k: 'reponse', l: 'Paroles à trouver (juste après l’arrêt)', t: 'zone', c: 'large' }] },
@@ -1324,7 +1383,7 @@ function renduEditeur() {
         h('button', { class: 'btn mini', disabled: i === 0, onclick: () => { [d[cleListe][i - 1], d[cleListe][i]] = [d[cleListe][i], d[cleListe][i - 1]]; renduEditeur(); } }, '↑'),
         h('button', { class: 'btn mini', disabled: i === d[cleListe].length - 1, onclick: () => { [d[cleListe][i + 1], d[cleListe][i]] = [d[cleListe][i], d[cleListe][i + 1]]; renduEditeur(); } }, '↓'),
         h('button', { class: 'btn mini', onclick: () => { if (confirm('Supprimer « ' + libelle + ' » ?')) { d[cleListe].splice(i, 1); renduEditeur(); } } }, '🗑')),
-      (ongletEd === 'paroles' || ongletEd === 'karaoke') ? h('div', { class: 'note large' }, '📄 Fichier lu si les paroles sont vides : paroles/' + nomFichierParoles(item.titre)) : null,
+      (ongletEd === 'paroles' || ongletEd === 'karaoke' || ongletEd === 'nuage') ? h('div', { class: 'note large' }, '📄 Fichier lu si les paroles sont vides : paroles/' + nomFichierParoles(item.titre)) : null,
       s.champs.map(c => champ(c, item))));
   });
   box.append(h('button', { class: 'btn', style: 'align-self:flex-start', onclick: () => {
@@ -1403,6 +1462,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'v') bonneReponse();
   else if (k === 'x') mauvaiseReponse();
   else if (k === 'n' && jeuCourant && jeuCourant.suivant) jeuCourant.suivant();
+  else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && jeuCourant && jeuCourant.ligne) { e.preventDefault(); jeuCourant.ligne(e.key === 'ArrowDown' ? 1 : -1); }
   else if (e.key === 'ArrowRight' && jeuCourant && jeuCourant.nav) jeuCourant.nav(1);
   else if (e.key === 'ArrowLeft' && jeuCourant && jeuCourant.nav) jeuCourant.nav(-1);
   else if (/^Digit[1-9]$/.test(e.code)) { const eq = equipes[Number(e.code.slice(5)) - 1]; if (eq) ajouterPoints(eq.id, e.shiftKey ? -1 : 1); }
