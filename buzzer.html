@@ -69,7 +69,7 @@
 <script>
 const $ = s => document.querySelector(s);
 const SALLE = (new URLSearchParams(location.search).get('salle') || '').trim().toUpperCase();
-let etat = null, peer = null, conn = null, envoi = false, relance = null;
+let etat = null, peer = null, conn = null, envoi = false, relance = null, essaiT = 0;
 let moi = null;
 try { moi = JSON.parse(localStorage.getItem('quiz-buzzer-' + SALLE) || 'null'); } catch (_) {}
 $('#joueur').value = (moi && moi.joueur) || localStorage.getItem('quiz-prenom') || '';
@@ -81,27 +81,38 @@ function annoncer() { envoyer({ type: 'hello', equipe: (moi && moi.equipe) || ''
 
 function connecter() {
   if (!SALLE) { statut("Lien incomplet : scannez le QR code affiché par l'animateur.", false); return; }
-  if (typeof Peer === 'undefined') { statut('Pas de connexion Internet…', false); return; }
+  if (typeof Peer === 'undefined') { statut('Pas de connexion Internet…', false); planifier(); return; }
   if (!peer || peer.destroyed) {
     peer = new Peer({ debug: 0 });
     peer.on('open', ouvrirConnexion);
     peer.on('disconnected', () => { try { peer.reconnect(); } catch (_) {} });
     peer.on('error', err => {
-      statut(err.type === 'peer-unavailable' ? "Le jeu de l'animateur n'est pas ouvert… nouvel essai" : 'Connexion difficile… nouvel essai', false);
+      if (err.type === 'peer-unavailable') statut("Le jeu de l'animateur n'est pas encore ouvert… nouvel essai", false);
+      else { statut('Connexion difficile… nouvel essai', false); try { peer.destroy(); } catch (_) {} peer = null; }
       planifier();
     });
   } else if (peer.open) ouvrirConnexion();
+  else if (peer.disconnected) { try { peer.reconnect(); } catch (_) { peer = null; planifier(); } }
 }
 function ouvrirConnexion() {
   if (conn && conn.open) return;
+  if (conn) { try { conn.close(); } catch (_) {} }
   statut('Connexion au jeu…', false);
-  conn = peer.connect('quizmusical-' + SALLE, { reliable: true });
-  conn.on('open', () => { statut('Connecté ✓', true); annoncer(); });
-  conn.on('data', d => { if (d && d.type === 'etat') { etat = d.etat; rendu(); } });
-  conn.on('close', () => { statut('Connexion perdue… reconnexion', false); planifier(); });
-  conn.on('error', () => planifier());
+  essaiT = Date.now();
+  const c = peer.connect('quizmusical-' + SALLE, { reliable: true });
+  conn = c;
+  // Si rien ne répond en 6 s (jeu pas encore ouvert, réseau lent), on abandonne cet essai et on recommence
+  const garde = setTimeout(() => {
+    if (conn === c && !c.open) { try { c.close(); } catch (_) {} statut("Le jeu de l'animateur ne répond pas… nouvel essai", false); planifier(); }
+  }, 6000);
+  c.on('open', () => { clearTimeout(garde); statut('Connecté ✓', true); annoncer(); });
+  c.on('data', d => { if (d && d.type === 'etat') { etat = d.etat; rendu(); } });
+  c.on('close', () => { clearTimeout(garde); if (conn === c) { statut('Connexion perdue… reconnexion', false); planifier(); } });
+  c.on('error', () => { clearTimeout(garde); if (conn === c) planifier(); });
 }
-function planifier() { clearTimeout(relance); relance = setTimeout(() => { conn = null; connecter(); }, 2500); }
+function planifier() { clearTimeout(relance); relance = setTimeout(() => { relance = null; if (conn && !conn.open) { try { conn.close(); } catch (_) {} } if (!(conn && conn.open)) { conn = null; connecter(); } }, 2500); }
+// filet de sécurité : toutes les 10 s, si on n'est pas connecté et qu'aucun essai n'est prévu, on relance
+setInterval(() => { if (!(conn && conn.open) && !relance && Date.now() - essaiT > 8000) connecter(); }, 5000);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !(conn && conn.open)) { conn = null; connecter(); } });
 
 function montrer(id) { document.querySelectorAll('.ecran').forEach(e => e.classList.toggle('actif', e.id === id)); }
