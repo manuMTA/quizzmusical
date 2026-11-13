@@ -4,4 +4,66 @@
 # Ligne vide = nouveau paragraphe.
 # Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
 #   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
-
+T'étais mon chouchou, j'peux pas oublier l'passé
+Oublier l'passé
+T'étais mon chouchou
+J'peux pas t'effacer
+T'es la plus belle des étoiles
+Parmi les autres, je vois que toi (je vois que toi)
+Si tu te sens seule, dis-moi (dis-moi)
+Il m'reste une place auprès de moi (auprès de moi)
+Les projecteurs sur toi (wouh)
+C'est fou comment tu brilles dans l'noir (c'est fou)
+T'es la plus belle, mademoiselle
+Comment j'aurais fait pour pas te voir?
+J'sais que l'passé, c'est l'passé (ouais, c'est passé)
+Mais entre nous, j'peux pas dire ce qu'il s'est passé (j'peux pas dire ce qu'il s'est passé)
+J'voudrais pouvoir rattraper le temps (rattraper le temps)
+Pour que tu partes, dis-moi qu'est-ce que j'ai fait, bon sang?
+(Qu'est-ce que j'ai fait, bon sang?)
+J'sais que l'passé, c'est l'passé
+Mais y a qu'à toi qu'j'peux me confier
+Tu sais, j'deviens parano des fois
+Quand j'reste seul, direct, je pense à toi
+Et ça fait, "clic, clic-clic, pan-pan-pan"
+J'braque ton petit cœur, ma chérie, t'es trop séduisante
+T'étais mon chouchou, j'sais pas ce qui c'est passé (nan)
+Je repense à toi chaque jour, j'aimerais recoller ce qui est cassé
+Tu m'dis qu'c'est fini, qu'y a plus d'nous (plus d'nous)
+J'ferais mieux de t'effacer (oui, t'effacer)
+Je sais pas à quoi tu joues, mais j'peux pas oublier l'passé
+J'peux pas oublier l'passé
+Oublier l'passé
+T'étais mon chouchou
+J'peux pas t'effacer
+T'es la plus belle des étoiles
+Parmi les autres, je vois que toi (je vois que toi)
+Si tu te sens seule, dis-moi (dis-moi)
+Il m'reste une place auprès de moi (auprès de moi)
+Les projecteurs sur toi (wouh)
+C'est fou comment tu brilles dans l'noir (c'est fou)
+T'es la plus belle mademoiselle
+Comment j'aurais fait pour pas te voir?
+Je sens que tu caches quelque chose (ouais)
+C'est bon, me mens pas (non, ne mens pas)
+T'es plus du tout comme avant
+J'sais pas c'qui s'passe, j'te r'connais pas (j'te r'connais pas)
+J'sais que parfois, je suis con
+Mais j'reste le premier dans ton cœur (ouais, dans ton coeur)
+Si les minutes sont des secondes
+J'te ferais l'amour pendant des heures
+J'sais que l'passé, c'est l'passé
+Mais y a qu'à toi qu'j'peux me confier
+Tu sais, j'deviens parano des fois
+Quand j'reste seul, direct, je pense à toi
+Et ça fait, "clic, clic-clic, pan-pan-pan"
+J'braque ton petit cœur, ma chérie, t'es trop séduisante (trop séduisante)
+T'étais mon chouchou, j'sais pas ce qui c'est passé (nan)
+Je repense à toi chaque jour, j'aimerais recoller ce qui est cassé
+Tu m'dis qu'c'est fini, qu'y a plus d'nous (plus d'nous)
+J'ferais mieux de t'effacer (oui, t'effacer)
+Je sais pas (j'sais pas) à quoi tu joues, mais j'peux pas oublier l'passé
+Et ça fait, "clic, clic-clic, pan-pan-pan"
+J'braque ton petit cœur, ma chérie, t'es trop séduisante
+Et ça fait, "clic, clic-clic, pan-pan-pan"
+J'braque ton petit cœur, ma chérie, t'es trop séduisante

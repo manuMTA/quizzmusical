@@ -4,4 +4,27 @@
 # Ligne vide = nouveau paragraphe.
 # Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
 #   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
+[Intro]
+Mmh, tu vas partir, je sais, oh
+Tu m'oublieras
 
+[Couplet 1]
+Tu oublieras tous ces jours, tout ce temps
+Qui n'appartenait qu'à nous
+Ce réveil, un matin, tes bras autour de mon cou
+Et l'amour que l'on faisait n'importe où
+Tu oublieras tout le mal que tu as
+En me regardant souffrir
+Ces instants difficiles où tu ne sais plus quoi dire
+Et qu'il faut simplement partir
+Tu oublieras les sourires, les regards
+Qui parlaient d'éternité
+Tous ces mots que l'on jure de ne jamais oublier
+Tu oublieras, tu m'oublieras
+
+[Refrain]
+You will forget (I will)
+No more you and I (No more)
+Yeah, yeah, yeah, yeah, yeah (Hey yeah yeah)
+You will forget
+No more love (You will forget)

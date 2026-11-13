@@ -665,7 +665,7 @@ const Lecteur = {
     if (!fichier) { toast('Aucun fichier audio pour cette chanson (✏️ Préparer).'); return false; }
     const url = Musique.url(fichier);
     if (!url) { toast(Musique.fichiers.size ? 'Fichier introuvable dans le dossier : ' + fichier : 'Chargez d’abord le dossier des musiques (colonne de gauche).'); return false; }
-    this.veilles = []; audio.muted = false;
+    this.veilles = []; audio.muted = false; this.virt = null;
     if (audio.dataset.f !== fichier) {
       audio.src = url; audio.dataset.f = fichier;
       await new Promise(ok => { audio.onloadedmetadata = ok; audio.onerror = ok; });
@@ -675,24 +675,37 @@ const Lecteur = {
     return true;
   },
   quand(t, cb) { this.veilles.push({ t: Number(t), cb }); },
-  stop() { audio.pause(); this.veilles = []; audio.muted = false; pauseParBuzz = false; }
+  stop() { audio.pause(); this.veilles = []; audio.muted = false; pauseParBuzz = false; this.virt = null; },
+  // Mode « sans son » : la musique est jouée ailleurs, un chronomètre remplace la lecture
+  virt: null,
+  demarrerSansSon(debut = 0) { audio.pause(); this.veilles = []; this.virt = { t0: performance.now() / 1000 - (Number(debut) || 0), pauseA: null }; },
+  temps() { const v = this.virt; return v ? (v.pauseA ?? performance.now() / 1000) - v.t0 : audio.currentTime; },
+  enCours() { return this.virt ? this.virt.pauseA == null : !audio.paused; },
+  pause() { if (this.virt) { if (this.virt.pauseA == null) this.virt.pauseA = performance.now() / 1000; } else audio.pause(); },
+  reprendre() { if (this.virt) { if (this.virt.pauseA != null) { this.virt.t0 += performance.now() / 1000 - this.virt.pauseA; this.virt.pauseA = null; } } else audio.play().catch(() => {}); },
+  // Lance la musique si un fichier est disponible, sinon le chronomètre (sans message d'erreur)
+  async lancerChanson(c) {
+    const f = c.fichier && Musique.trouver(c.fichier) ? c.fichier : Musique.deviner(c.titre, c.artiste);
+    if (f && await this.jouer(f, c.debut)) { this.virt = null; return true; }
+    this.demarrerSansSon(0); return true;
+  }
 };
 function boucle() {
-  const t = audio.currentTime;
-  if (!audio.paused && Lecteur.veilles.length) {
+  const t = Lecteur.temps();
+  if (Lecteur.enCours() && Lecteur.veilles.length) {
     const prets = Lecteur.veilles.filter(v => t >= v.t);
     if (prets.length) { Lecteur.veilles = Lecteur.veilles.filter(v => t < v.t); prets.forEach(v => v.cb(t)); }
   }
   if (jeuCourant && jeuCourant.tic) jeuCourant.tic(t);
-  if (!glisse && audio.duration) $('#progression').value = Math.round(t / audio.duration * 1000);
-  $('#temps').textContent = fmt(t); $('#duree').textContent = fmt(audio.duration);
-  $('#btn-lecture').textContent = audio.paused ? '▶' : '⏸';
+  if (!glisse && audio.duration && !Lecteur.virt) $('#progression').value = Math.round(t / audio.duration * 1000);
+  $('#temps').textContent = (Lecteur.virt ? '⏱ ' : '') + fmt(t); $('#duree').textContent = Lecteur.virt ? 'sans son' : fmt(audio.duration);
+  $('#btn-lecture').textContent = Lecteur.enCours() ? '⏸' : '▶';
   requestAnimationFrame(boucle);
 }
 $('#progression').addEventListener('input', () => { glisse = true; });
 $('#progression').addEventListener('change', e => { if (audio.duration) audio.currentTime = e.target.value / 1000 * audio.duration; glisse = false; });
 $('#volume').oninput = e => { audio.volume = e.target.value; };
-function basculerLecture() { if (!audio.src) return; if (audio.paused) { pauseParBuzz = false; audio.play().catch(() => {}); } else audio.pause(); }
+function basculerLecture() { if (Lecteur.virt) { Lecteur.enCours() ? Lecteur.pause() : Lecteur.reprendre(); return; } if (!audio.src) return; if (audio.paused) { pauseParBuzz = false; audio.play().catch(() => {}); } else audio.pause(); }
 $('#btn-lecture').onclick = basculerLecture;
 
 // =====================================================================
@@ -881,24 +894,23 @@ function creerParoles() {
     paras.slice(0, vus).forEach((p, i) => zoneTexte.append(h('div', { class: 'paroles-avant', style: i < vus - 1 ? 'opacity:.4;font-size:22px' : '' }, p.texte)));
     if (phase === 'stop' || phase === 'revele') zoneTexte.append(trous(c.reponse, phase === 'revele'));
     zoneTexte.scrollTop = zoneTexte.scrollHeight;
-    if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'));
+    if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'), h('span', { class: 'note' }, 'au même moment que la musique'));
     if ((phase === 'pret' || phase === 'lecture') && vus < paras.length) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { vus++; rendu(); } }, 'Paragraphe suivant ▼'));
-    if (phase === 'lecture') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: stopper }, '⏹ Arrêter ici'));
+    if (phase === 'lecture') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: stopper }, Lecteur.virt ? '⏹ Stop : à vous de chanter' : '⏹ Arrêter ici'));
     if (phase === 'stop') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: reveler }, '👀 Révéler les paroles'));
-    if (phase === 'stop' || phase === 'revele') zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { pauseParBuzz = false; audio.play().catch(() => {}); } }, '▶ Écouter la suite'));
+    if (phase === 'stop' || phase === 'revele') zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { pauseParBuzz = false; Lecteur.reprendre(); } }, Lecteur.virt ? '▶ Continuer' : '▶ Écouter la suite'));
     if (phase !== 'pret') zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { phase = 'pret'; afficher(); } }, '↺ Recommencer'));
   }
   async function lancer() {
     const c = cur;
-    const f = c.fichier || Musique.deviner(c.titre, c.artiste);
-    if (!(await Lecteur.jouer(f, c.debut))) return;
+    await Lecteur.lancerChanson(c);
     phase = 'lecture';
     if (paras.length && paras[0].t == null) vus = Math.max(vus, 1);
     paras.forEach((p, i) => { if (p.t != null) Lecteur.quand(p.t, () => { if (vus <= i) { vus = i + 1; rendu(); } }); });
     if (Number(c.arret) > 0) Lecteur.quand(c.arret, stopper);
     rendu();
   }
-  function stopper() { audio.pause(); Lecteur.veilles = []; phase = 'stop'; rendu(); sonner([660, 880], .12, 'triangle', .2); }
+  function stopper() { Lecteur.pause(); Lecteur.veilles = []; phase = 'stop'; rendu(); sonner([660, 880], .12, 'triangle', .2); }
   function reveler() { if (phase === 'lecture') stopper(); phase = 'revele'; faits.add(idx); rendu(); }
   J.surBonne = () => { if (idx >= 0) reveler(); };
   J.nav = d => { if (!L().length) return; idx = idx < 0 ? 0 : (idx + d + L().length) % L().length; phase = 'pret'; afficher(); };
@@ -997,25 +1009,27 @@ function creerKaraoke() {
     zoneTexte.classList.toggle('karaoke-coupure', phase === 'coupure');
     zoneTexte.append(texteAvecTrou());
     if (phase === 'coupure') { chrono = h('span', { class: 'chrono-geant', style: 'font-size:48px' }); zoneEtat.append(h('span', { class: 'grand-message', style: 'font-size:40px' }, '🎤 À VOUS DE CHANTER ! '), chrono); }
-    if (phase === 'retour') zoneEtat.append(h('div', { class: 'grand-message', style: 'font-size:34px' }, '🔊 Le son revient… dans le rythme ?'));
-    if (phase === 'lecture') zoneEtat.append(h('div', { class: 'note' }, Number(c.coupure) ? 'Coupure du son à ' + fmt(c.coupure) : 'Coupez le son au moment du trou'));
+    if (phase === 'retour') zoneEtat.append(h('div', { class: 'grand-message', style: 'font-size:34px' }, Lecteur.virt ? '🎶 Alors, dans le rythme ?' : '🔊 Le son revient… dans le rythme ?'));
+    if (phase === 'lecture') zoneEtat.append(h('div', { class: 'note' }, Number(c.coupure) ? (Lecteur.virt ? 'Passage à chanter à ' : 'Coupure du son à ') + fmt(c.coupure) : (Lecteur.virt ? 'Cliquez « À vous de chanter » au moment du trou' : 'Coupez le son au moment du trou')));
     zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, phase === 'pret' ? '▶ Lancer la chanson' : '↺ Relancer'));
-    if (phase === 'lecture' || phase === 'retour') zoneCmd.append(h('button', { class: 'btn gros', onclick: couper }, '🔇 Couper le son'));
-    if (phase === 'coupure') zoneCmd.append(h('button', { class: 'btn gros', onclick: retablir }, '🔊 Remettre le son'));
+    if (phase === 'pret') zoneCmd.append(h('span', { class: 'note' }, 'au même moment que la musique'));
+    if (phase === 'lecture' || phase === 'retour') zoneCmd.append(h('button', { class: 'btn gros', onclick: couper }, Lecteur.virt ? '🎤 À vous de chanter' : '🔇 Couper le son'));
+    if (phase === 'coupure') zoneCmd.append(h('button', { class: 'btn gros', onclick: retablir }, Lecteur.virt ? '⏭ Fin du passage' : '🔊 Remettre le son'));
     if (!revele && trou.total) zoneCmd.append(h('button', { class: 'btn gros', onclick: reveler }, '👀 Révéler les mots'));
     if (revele) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { trou = preparerTrou(cur); revele = false; rendu(); } }, '🎲 Autres mots cachés'));
   }
   async function lancer() {
     const c = cur;
-    const f = c.fichier || Musique.deviner(c.titre, c.artiste);
-    if (!(await Lecteur.jouer(f, c.debut))) return;
+    await Lecteur.lancerChanson(c);
     phase = 'lecture'; rendu();
     if (Number(c.coupure) > 0) Lecteur.quand(c.coupure, couper);
   }
   function couper() {
-    const c = cur; if (audio.paused && audio.src) audio.play().catch(() => {});
-    audio.muted = true; phase = 'coupure';
-    finCoupure = audio.currentTime + (Number(c.duree) || 8);
+    const c = cur;
+    if (!Lecteur.virt) { if (audio.paused && audio.src) audio.play().catch(() => {}); audio.muted = true; }
+    else if (!Lecteur.enCours()) Lecteur.reprendre();
+    phase = 'coupure';
+    finCoupure = Lecteur.temps() + (Number(c.duree) || 8);
     Lecteur.veilles = []; Lecteur.quand(finCoupure, retablir); rendu();
   }
   function retablir() { audio.muted = false; Lecteur.veilles = []; phase = 'retour'; rendu(); }

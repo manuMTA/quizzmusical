@@ -4,4 +4,46 @@
 # Ligne vide = nouveau paragraphe.
 # Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
 #   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
-
+Mesdames et messieurs, bonjour
+Vous êtes sur le vol 777 à destination de Papeete, Tahiti
+Je vous demanderais de bien vouloir remonter votre cachet bleu
+Je suis le commandant Keen'V, bienvenue à bord
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+J'ai pris mes billets Air Tahiti Nui
+Le voyage durera une journée et une nuit
+T'as compris l'idée, je veux fuir l'ennui
+Là-bas, t'y trouveras un coin de paradis
+J'veux m'envoler hé, hé
+Mais j'n'oublie pas ah, ah
+Quand j'partirai hé, hé
+Ia ora na ah, ah
+Fleur de tiare hé, hé
+Et mānava ah, ah
+Quand j'y serai, je n'en repartirai pas
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Dans cet endroit merveilleux où il n'y a pas d'hiver
+Je vais en prendre plein les yeux dans ce paradis découvert
+Oui, je ferai des envieux dans ce petit coin de vert
+Sûrement un des plus beaux lieux de l'univers
+Pouvoir me baigner dans ce beau lagon
+Un jour j'irai hé, hé, un jour j'irai hé, hé
+Oui, au soleil tout me semblera bon
+Un jour, j'irai alors viens avec moi
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour, j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Papeete, Moorea, toi et moi, on ira
+Tuamotu, Bora Bora, toi et moi, on ira
+Papeete, Moorea, toi et moi, on ira
+Tuamotu, Bora Bora, toi et moi, on ira
+Un jour j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
+Un jour j'irai à Tahiti, c'est là qu'j'vivrai ma meilleure vie
