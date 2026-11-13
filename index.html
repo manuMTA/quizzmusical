@@ -221,6 +221,8 @@ body.jeu-paroles #jeu { overflow: hidden; }
 body.jeu-paroles #jeu .carte { overflow: hidden !important; }
 #chrono-paroles { display: none; position: absolute; right: 22px; bottom: 14px; font-size: 14px; color: var(--doux); background: rgba(9,8,22,.7); padding: 4px 10px; border-radius: 8px; }
 body.jeu-paroles #chrono-paroles.actif { display: block; }
+.paroles-vue { height: calc(7 * 1.45em); overflow: hidden; font-size: 30px; font-family: var(--titre); font-weight: 500; text-align: center; flex-shrink: 0; }
+.paroles-defile > div { line-height: 1.45; }
 #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #2a2458; border: 1px solid #5a4aa8; padding: 10px 18px; border-radius: 12px; z-index: 99; display: none; max-width: 80vw; }
 #toast.vu { display: block; animation: descend .2s; }
 #fin-manche { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 40; background: rgba(4,3,12,.7); }
@@ -280,7 +282,7 @@ body.jeu-paroles #chrono-paroles.actif { display: block; }
     Espace : lecture / pause<br>
     R : réarmer · B : ouvrir/fermer<br>
     V : bonne réponse · X : mauvaise<br>
-    N : paroles suivantes · ↑ ↓ : une ligne (jeux 2 et 4)<br>
+    N : paroles suivantes · ↑ ↓ : défiler (jeux 2 et 4)<br>
     ← → : chanson précédente / suivante<br>
     1 à 9 : +1 point à l'équipe n°<br>
     Maj + 1 à 9 : −1 point
@@ -902,8 +904,9 @@ function paginer(paras) {
 }
 function creerParoles() {
   const J = { id: 'paroles', nom: 'Terminer les paroles', icone: '🎤' };
-  let idx = -1, racine, phase = 'pret', paras = [], vus = 0, zoneTexte, zoneCmd, cur = null, off = 0;
+  let idx = -1, racine, phase = 'pret', paras = [], vus = 0, zoneTexte, zoneCmd, cur = null, off = 0, offPrec = 0;
   const FENETRE = 7; // lignes affichées en même temps
+  const PAS = 3;     // flèches ↓ ↑ : 3 lignes à chaque appui
   const faits = new Set();
   const L = () => CONFIG.paroles.chansons || [];
   J.ouvrir = el => { racine = el; if (idx >= L().length) idx = -1; idx < 0 ? afficherChoix() : afficher(); };
@@ -919,7 +922,7 @@ function creerParoles() {
     Lecteur.stop(); racine.innerHTML = '';
     const n = idx; const c = await FichiersParoles.pourParoles(L()[idx]); if (n !== idx) return;
     cur = c; racine.innerHTML = '';
-    paras = paginer(decouperParagraphes(c)); vus = 0; off = 0;
+    paras = paginer(decouperParagraphes(c)); vus = 0; off = 0; offPrec = 0;
     racine.append(h('div', { class: 'entete-jeu' },
       h('span', { class: 'num-chanson' }, 'N° ' + (idx + 1)), h('h2', {}, '🎤 ' + (c.titre || 'Chanson')), c.artiste ? h('span', { class: 'compteur', style: 'font-size:20px' }, c.artiste) : null,
       h('div', { class: 'pastilles' }, h('button', { class: 'btn', onclick: afficherChoix }, '↩ Choisir une autre chanson'))));
@@ -944,12 +947,17 @@ function creerParoles() {
     if (vus >= 1) {
       const { lignes, debut } = lignesVues();
       off = Math.max(0, Math.min(off, lignes.length - 1));
-      const box = h('div', { class: 'paroles-avant' });
-      lignes.slice(off, off + FENETRE).forEach((l, k) => box.append(h('div', { style: off + k < debut ? 'opacity:.45' : '' }, l || '\u00a0')));
-      zoneTexte.append(box);
+      // toutes les lignes dans une « fenêtre » : le texte glisse vers le haut, sans changer de taille
+      const vue = h('div', { class: 'paroles-vue' }), contenu = h('div', { class: 'paroles-defile' });
+      lignes.forEach((l, k) => contenu.append(h('div', { style: k < debut ? 'opacity:.45' : '' }, l || '\u00a0')));
+      vue.append(contenu); zoneTexte.append(vue);
+      const haut = i => (contenu.children[Math.min(i, contenu.children.length - 1)] || { offsetTop: 0 }).offsetTop;
+      contenu.style.transition = 'none'; contenu.style.transform = 'translateY(' + (-haut(offPrec)) + 'px)';
+      void contenu.offsetWidth;
+      contenu.style.transition = 'transform .45s ease'; contenu.style.transform = 'translateY(' + (-haut(off)) + 'px)';
+      offPrec = off;
     }
     if (phase === 'stop' || phase === 'revele') zoneTexte.append(trous(c.reponse, phase === 'revele'));
-    zoneTexte.scrollTop = zoneTexte.scrollHeight;
     if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'), h('span', { class: 'note' }, 'au même moment que la musique'));
     if (phase !== 'revele' && vus < paras.length) zoneCmd.append(h('button', { class: 'btn gros', onclick: () => J.suivant() }, 'Paroles suivantes ▼', h('kbd', {}, 'N')));
     if (phase === 'lecture') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: stopper }, Lecteur.virt ? '⏹ Stop : à vous de chanter' : '⏹ Arrêter ici'));
@@ -981,9 +989,9 @@ function creerParoles() {
     if (d > 0) {
       if (!vus) return allerPage(1);
       const n = lignesVues().lignes.length;
-      if (off + FENETRE >= n && vus < paras.length) vus++;          // plus rien en dessous : on ajoute la suite
-      if (off < lignesVues().lignes.length - 1) off++;
-    } else off = Math.max(0, off - 1);
+      if (off + PAS + FENETRE > n && vus < paras.length) vus++;     // bientôt plus rien en dessous : on ajoute la suite
+      off = Math.min(off + PAS, Math.max(0, lignesVues().lignes.length - PAS));
+    } else off = Math.max(0, off - PAS);
     rendu();
   };
   J.surBonne = () => { if (idx >= 0) reveler(); };

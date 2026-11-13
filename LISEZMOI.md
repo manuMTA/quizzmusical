@@ -37,3 +37,73 @@ La préparation, les équipes et les scores sont gardés dans le navigateur de c
 5. **Chacun son tour** : choisissez l'artiste ; chaque équipe cite un titre à son tour, vous le tapez et l'appli vérifie (accents, majuscules et petites fautes tolérés, doublons détectés). Chrono par tour, élimination et point par titre se règlent dans ✏️ Préparer. Les listes de Cabrel (80 titres), Gims (134), Vianney (50), Stromae (51) et Johnny (167) sont pré-remplies, duos et featurings compris (le partenaire s'affiche entre parenthèses, il n'a pas à être cité) ; si une préparation était déjà enregistrée, les titres manquants y sont ajoutés automatiquement. « Valider quand même » ajoute un titre manquant à la liste.
 
 Les paroles ne sont pas fournies : c'est vous qui les saisissez dans ✏️ Préparer.
+
+## 5. Liste des chansons par jeu
+Le numéro est celui affiché à l'écran.
+
+```
+JEU 1 — NUAGE DE MOTS
+(ordre de passage tiré au hasard à l'écran : repérez la chanson par son titre)
+------------------------------------------------------------
+ 1. Le Jerk — Thierry Hazard
+ 2. Aïcha — Khaled
+ 3. Caroline — MC Solaar
+ 4. Allumer le feu — Johnny Hallyday
+ 5. Au soleil — Jenifer
+ 6. La Boulette — Diam's
+ 7. Ma philosophie — Amel Bent
+ 8. Parle à ma main — Fatal Bazooka feat. Yelle
+ 9. Le temps — Tayc
+10. Sous le vent — Garou et Céline Dion
+11. La Tribu de Dana — Manau
+12. Sapés comme jamais — Maître Gims feat. Niska
+13. Ciel — Gims
+14. Balance ton quoi — Angèle
+    Total : 14 chansons
+
+JEU 2 — TERMINER LES PAROLES
+(les équipes choisissent leur chanson)
+------------------------------------------------------------
+ 1. Melodrama — Disiz et Theodora
+ 2. Clic clic pan pan — Yanns
+ 3. Et bam — Mentissa
+ 4. Tahiti — Keen'V
+ 5. Beau-papa — Vianney
+ 6. Je t'emmène au vent — Louise Attaque
+ 7. Tu m'oublieras — Larusso
+ 8. Je danse le Mia — IAM
+ 9. Tomber la chemise — Zebda
+    Total : 9 chansons
+
+JEU 3 — BLIND TEST
+(liste à compléter dans ✏️ Préparer)
+------------------------------------------------------------
+
+
+JEU 4 — KARAOKÉ « GARDE LE RYTHME »
+(les équipes choisissent leur chanson)
+------------------------------------------------------------
+ 1. Les Lacs du Connemara — Michel Sardou
+ 2. Les Champs-Élysées — Joe Dassin
+ 3. Santiano — Hugues Aufray
+ 4. Je te donne — Jean-Jacques Goldman et Michael Jones
+ 5. Mexico — Luis Mariano
+ 6. Petite Marie — Francis Cabrel
+ 7. La même — Gims et Vianney
+ 8. Dommage — Bigflo & Oli
+ 9. Moi... Lolita — Alizée
+10. En feu — Soprano
+11. Melodrama — Disiz et Theodora
+12. Coco — Wejdene
+13. Beau-papa — Vianney
+    Total : 13 chansons
+
+JEU 5 — CHACUN SON TOUR
+(choisir un artiste ; titres acceptés vérifiés par l'application)
+------------------------------------------------------------
+ 1. Francis Cabrel (80 titres dans la liste)
+ 2. Gims (133 titres dans la liste)
+ 3. Vianney (50 titres dans la liste)
+ 4. Stromae (51 titres dans la liste)
+ 5. Johnny Hallyday (167 titres dans la liste)
+```
