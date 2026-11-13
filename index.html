@@ -945,7 +945,7 @@ function creerParoles() {
       const { lignes, debut } = lignesVues();
       off = Math.max(0, Math.min(off, lignes.length - 1));
       const box = h('div', { class: 'paroles-avant' });
-      lignes.slice(off, off + FENETRE).forEach((l, k) => box.append(h('div', { style: off + k < debut ? 'opacity:.4;font-size:22px' : '' }, l || '\u00a0')));
+      lignes.slice(off, off + FENETRE).forEach((l, k) => box.append(h('div', { style: off + k < debut ? 'opacity:.45' : '' }, l || '\u00a0')));
       zoneTexte.append(box);
     }
     if (phase === 'stop' || phase === 'revele') zoneTexte.append(trous(c.reponse, phase === 'revele'));
@@ -1090,7 +1090,7 @@ function creerKaraoke() {
     // fenêtre de lignes visibles ; les lignes d'avant la page en cours sont estompées
     const ligne = (l, style) => { const d = h('div', { style }); l.forEach(n => d.append(n)); return d; };
     let trouVisible = false;
-    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; box.append(ligne(l, off + k < debuts[page] ? 'opacity:.4;font-size:22px' : '')); });
+    plat.slice(off, off + FENETRE).forEach((l, k) => { if (l.some(n => n.dataset && n.dataset.trou)) trouVisible = true; box.append(ligne(l, off + k < debuts[page] ? 'opacity:.45' : '')); });
     if (!revele && trouVisible) box.append(h('span', { class: 'note', style: 'display:block;margin-top:14px;font-size:16px' }, '… ' + (fin - debut + 1) + ' mots à chanter'));
     if (nbPages > 1) box.append(h('div', { class: 'note', style: 'margin-top:12px;font-size:14px' }, 'Page ' + (page + 1) + ' / ' + nbPages));
     return box;

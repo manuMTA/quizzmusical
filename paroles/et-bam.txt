@@ -4,108 +4,60 @@
 # Ligne vide = nouveau paragraphe.
 # Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
 #   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
-J'suis en feu (j'suis chaud, j'suis chaud, j'suis chaud)
-J'suis en feu (j'suis chaud, j'suis chaud, j'suis chaud)
-J'suis en feu
-
-Comme Zinedine Zidane face à l'équipe du Brazil
-J'suis en feu
-Ce soir tout me sourit même Monica Bellucci
-J'suis en feu
-J'ai sorti le gros gamos, ce soir j'suis le prince de la ville
-J'suis en feu
-J'ai mis mes plus beaux tissus, appelle les paparazzi
-J'suis en feu
-Ce soir je suis intouchable, je danse comme Omar Sy
-J'suis en feu
-Le sol s'allume, même Michael Jackson me dit merci
-J'suis en feu
-Le DJ me fait une passe et boum dans la lucarne
-J'suis en feu
-Sors de la piste, j'te fais le grand écart de Van Damme
-J'suis en feu
-
-Je sens que je vais briller, ce soir je marche sur l'eau
-J'ai l'impression de planer, regarder d'un hublot
-
-Si tu me croises, fais un vœu
-Si tu me parles, fais un vœu
-Si tu me touches, fais un vœu
-Car moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Car moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Crois-moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Crois-moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-
-J'suis en feu (j'suis chaud, j'suis chaud, j'suis chaud)
-J'suis en feu (j'suis chaud, j'suis chaud, j'suis chaud)
-J'suis en feu
-
-Comme l'équipe d'Algérie en Coupe du Monde au Brazil
-J'suis en feu
-Ce soir je suis un Warrior, appelle-moi Stephen Curry
-J'suis en feu
-Je sors de deux heures de sport amène moi Teddy Riner
-J'suis en feu
-Comme ce grand blondinet énervé contre freezer
-J'suis en feu
-Ce soir je ne joue pas mais j'repars avec le trophée
-J'suis en feu
-Tu m'as appelé Kirikou, ce soir je suis John Cofee
-J'suis en feu
-Comme la sœur de Beyoncé dans l'ascenseur avec Jay Z
-J'suis en feu
-Ou comme les trois petits à six heures du mat' sur mon lit
-J'suis en feu
-
-Je sens que je vais briller, ce soir je marche sur l'eau
-J'ai l'impression de planer, regarder d'un hublot
-
-Si tu me croises, fais un vœu
-Si tu me parles, fais un vœu
-Si tu me touches, fais un vœu
-Car moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Car moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Crois-moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Crois-moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-J'suis en feu
-
-Ça sent le brûlé, ça sent
-Ça sent le brûlé, appelle les pompiers
-J'suis chaud, j'suis chaud, j'suis chaud, j'suis chaud
-Ça sent le brûlé, ça sent
-Ça sent le brûlé, appelle les pompiers
-J'suis chaud, j'suis chaud, j'suis chaud, j'suis chaud
-Ça sent le brûlé, ça sent
-Ça sent le brûlé, appelle les pompiers
-J'suis chaud, j'suis chaud, j'suis chaud, j'suis chaud
-Ça sent le brûlé, ça sent
-Ça sent le brûlé, appelle les pompiers
-J'suis chaud, j'suis chaud, j'suis chaud, j'suis chaud
-
-Je sens que je vais briller, ce soir je marche sur l'eau
-J'ai l'impression de planer, regarder d'un hublot
-
-Si tu me croises, fais un vœu
-Si tu me parles, fais un vœu
-Si tu me touches, fais un vœu
-Car moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Car moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Crois-moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-Crois-moi ce soir je suis en feu
-J'suis en feu, j'suis en feu
-J'suis en feu
-
-Oh oh oh oh, appelle les pompiers
-Oh oh oh oh, appelle les pompiers
-Appelle les pompiers
+Gare du Nord en novembre
+Les cheveux en pagaille
+Comme une boule au ventre qui me tend qui me tord
+Et Paris qui s'étale
+Tout à coup me voilà
+Les jambes fébriles
+Qu'elle est grande pour moi cette scène imposante
+Où tout devient fragile
+Et bam, et bam
+Dans la poitrine
+Maman, je l'ai fait pour ça
+Je veux pas, je veux l'Amérique
+Je veux ce cœur qui bat
+Et bam, et bam
+Sur la musique
+Maman, je l'ai fait pour toi
+Je veux pas, je veux pas l'Amérique
+Envolée mon enfance
+Mais jamais rien n'efface
+Les rêves ou la violence
+Ha oui ça vous glace
+Mais c'est pour ça qu'on chante
+Donnez-moi d'échouer
+Et que vienne la pluie
+On ne m'ôtera jamais que j'ai déjà gagné
+De nouveaux amis
+Et bam, et bam
+Dans la poitrine
+Maman, je l'ai fait pour ça
+Je veux pas, je veux l'Amérique
+Je veux ce cœur qui bat
+Et bam, et bam
+Sur la musique
+Maman, je l'ai fait pour toi
+Je veux pas, je veux pas l'Amérique
+Et plus fort que ma voix
+Je l'entends frapper
+Ce cœur qui bam
+Et balaye mes larmes
+Et mes pourquoi
+Et bam, et bam
+Dans la poitrine
+Maman, je l'ai fait pour ça
+Je veux pas, je veux l'Amérique
+Je veux ce cœur qui bat
+Et bam, et bam
+Sur la musique
+Messieurs, mesdames, me voilà
+Je veux pas, je veux pas l'Amérique
+Je veux ce cœur qui bat
+Et bam et bam
+Oh, oh, oh, oh
+Et bam et bam
+Oh, oh, oh, oh
+Et bam et bam
+Oh, oh, oh, oh
+Je veux ce cœur qui bat
