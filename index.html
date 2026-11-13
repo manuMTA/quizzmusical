@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz musical — Animateur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fond: #090816; --panneau: #12102a; --panneau2: #1a1738; --bord: #2a2652; --texte: #f2f1ff; --doux: #a9a6d6;
+  --accent: #ff4fa3; --accent2: #7c5cff; --ok: #22d36b; --ko: #ff4d5e; --or: #ffcf3a;
+  --titre: "Fredoka", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; color: var(--texte); overflow: hidden;
+  background: radial-gradient(ellipse at 50% -10%, #2a1d6b 0%, #120f33 35%, var(--fond) 70%);
+  display: grid; grid-template-columns: 220px 1fr 280px; grid-template-rows: auto 1fr;
+  grid-template-areas: "barre barre barre" "cat scene scores";
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+kbd { font-size: 11px; background: rgba(255,255,255,.12); border-radius: 4px; padding: 1px 5px; margin-left: 4px; font-family: inherit; opacity: .8; }
+.btn { background: var(--panneau2); border: 1px solid var(--bord); border-radius: 10px; padding: 8px 12px; font-size: 14px; white-space: nowrap; }
+.btn:hover { border-color: #4a448a; background: #221e48; }
+.btn.plein { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: 0; font-weight: 700; }
+.btn.vert { background: var(--ok); color: #04210f; border: 0; font-weight: 800; }
+.btn.rouge { background: var(--ko); color: #fff; border: 0; font-weight: 800; }
+.btn.gros { font-size: 18px; padding: 13px 22px; border-radius: 14px; font-weight: 700; }
+.btn:disabled { opacity: .4; cursor: default; }
+
+/* ---------- Barre du haut : lumières des équipes ---------- */
+#barre { grid-area: barre; display: flex; align-items: center; gap: 18px; padding: 10px 18px; border-bottom: 1px solid var(--bord); background: rgba(9,8,22,.6); }
+#logo { font-family: var(--titre); font-size: 22px; font-weight: 700; white-space: nowrap;
+  background: linear-gradient(90deg, #ff7ac0, #9d8bff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#lumieres { flex: 1; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.lampe { --c: #888; position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 96px; padding: 6px 10px; border-radius: 14px; transition: .2s; }
+.lampe .bulbe { width: 50px; height: 50px; border-radius: 50%; background: var(--c); filter: saturate(.35) brightness(.38); transition: .15s;
+  box-shadow: inset 0 -8px 14px rgba(0,0,0,.45), inset 0 6px 10px rgba(255,255,255,.15); }
+.lampe .nom { font-family: var(--titre); font-weight: 600; font-size: 15px; color: var(--doux); }
+.lampe .tel { position: absolute; top: 0; left: 4px; font-size: 11px; color: var(--doux); }
+.lampe.allumee .bulbe { filter: none; box-shadow: 0 0 20px var(--c), 0 0 55px var(--c), inset 0 -8px 14px rgba(0,0,0,.2), inset 0 6px 10px rgba(255,255,255,.4); }
+.lampe.allumee .nom { color: var(--texte); }
+.lampe.premiere { background: color-mix(in srgb, var(--c) 18%, transparent); }
+.lampe.premiere .bulbe { animation: clignote .45s ease-in-out infinite alternate; }
+.lampe .rang { position: absolute; top: -2px; right: 10px; background: #fff; color: #000; border-radius: 999px; font-size: 12px; font-weight: 800; padding: 1px 7px; }
+.lampe.exclue { opacity: .35; } .lampe.exclue .nom { text-decoration: line-through; }
+@keyframes clignote { from { transform: scale(1); } to { transform: scale(1.14); } }
+#actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; max-width: 470px; }
+#etat-buzz.ferme { background: #3a1420; border-color: #7a2a3a; }
+#reseau { font-size: 12px; color: var(--doux); white-space: nowrap; }
+#reseau b { color: var(--ok); } #reseau.ko b { color: var(--ko); }
+
+/* ---------- Catégories ---------- */
+#categories { grid-area: cat; border-right: 1px solid var(--bord); padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; overflow: auto; }
+#categories h3, #scores h3 { margin: 4px 6px 6px; font-family: var(--titre); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--doux); }
+.cat { display: flex; align-items: center; gap: 10px; text-align: left; background: transparent; border: 1px solid transparent; border-radius: 14px; padding: 11px 12px; }
+.cat:hover { background: var(--panneau); }
+.cat.active { background: linear-gradient(135deg, rgba(255,79,163,.2), rgba(124,92,255,.2)); border-color: #5a4aa8; }
+.cat .ico { font-size: 24px; width: 34px; text-align: center; }
+.cat .num { font-size: 11px; color: var(--doux); }
+.cat .lib { font-family: var(--titre); font-weight: 600; font-size: 16px; line-height: 1.15; }
+#rejoindre-mini { margin-top: auto; background: var(--panneau); border: 1px solid var(--bord); border-radius: 14px; padding: 10px; text-align: center; cursor: pointer; }
+#rejoindre-mini .qr { background: #fff; border-radius: 8px; padding: 6px; width: 130px; margin: 0 auto 6px; }
+#rejoindre-mini .qr svg, #qr-grand svg { width: 100%; height: auto; display: block; }
+#rejoindre-mini small { color: var(--doux); }
+#musique-etat { background: var(--panneau); border: 1px dashed var(--bord); border-radius: 12px; padding: 9px; font-size: 13px; color: var(--doux); text-align: center; }
+#musique-etat b { color: var(--texte); }
+
+/* ---------- Scène ---------- */
+#scene { grid-area: scene; display: flex; flex-direction: column; min-width: 0; min-height: 0; position: relative; }
+#main-a { display: none; align-items: center; gap: 14px; padding: 10px 18px; margin: 12px 16px 0; border-radius: 16px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 55%, transparent), color-mix(in srgb, var(--c) 15%, transparent)); border: 2px solid var(--c);
+  animation: descend .25s ease-out; }
+#main-a.visible { display: flex; }
+#main-a .qui { flex: 1; font-family: var(--titre); font-size: 26px; font-weight: 700; }
+#main-a .qui small { font-family: inherit; font-size: 16px; opacity: .85; font-weight: 500; }
+@keyframes descend { from { transform: translateY(-12px); opacity: 0; } }
+#jeu { flex: 1; overflow: auto; padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+#flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle, var(--c) 0%, transparent 70%); }
+#flash.go { animation: flash .7s ease-out; }
+@keyframes flash { 0% { opacity: .75; } 100% { opacity: 0; } }
+
+#lecteur { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-top: 1px solid var(--bord); background: rgba(9,8,22,.7); font-size: 13px; color: var(--doux); }
+#lecteur input[type=range] { accent-color: var(--accent); }
+#progression { flex: 1; }
+#volume { width: 90px; }
+#btn-lecture { width: 42px; height: 42px; border-radius: 50%; border: 0; background: linear-gradient(135deg, var(--accent), var(--accent2)); font-size: 17px; }
+#lecteur label { display: flex; gap: 5px; align-items: center; white-space: nowrap; }
+
+/* ---------- Scores ---------- */
+#scores { grid-area: scores; border-left: 1px solid var(--bord); padding: 14px 12px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+.ligne-score { --c: #888; display: grid; grid-template-columns: 8px 1fr auto; align-items: center; gap: 10px; background: var(--panneau); border: 1px solid var(--bord); border-radius: 14px; padding: 10px 10px 10px 0; overflow: hidden; }
+.ligne-score .couleur { height: 100%; background: var(--c); box-shadow: 0 0 14px var(--c); }
+.ligne-score .nom { font-family: var(--titre); font-weight: 600; font-size: 17px; }
+.ligne-score .val { font-family: var(--titre); font-size: 40px; font-weight: 700; line-height: 1; color: var(--c); text-shadow: 0 0 18px color-mix(in srgb, var(--c) 50%, transparent); }
+.ligne-score .boutons { display: flex; flex-direction: column; gap: 4px; }
+.ligne-score .boutons button { width: 38px; height: 30px; border-radius: 8px; border: 1px solid var(--bord); background: var(--panneau2); font-size: 18px; font-weight: 800; line-height: 1; }
+.ligne-score .boutons button:hover { background: #2a2558; }
+.ligne-score .milieu { display: flex; flex-direction: column; gap: 2px; }
+.ligne-score.tete .nom::after { content: " 👑"; }
+.ligne-score.bump .val { animation: bump .4s; }
+@keyframes bump { 40% { transform: scale(1.35); } }
+#aide-clavier { margin-top: auto; font-size: 12px; color: var(--doux); line-height: 1.7; background: var(--panneau); border-radius: 12px; padding: 10px; }
+
+/* ---------- Éléments de jeu communs ---------- */
+.entete-jeu { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.entete-jeu h2 { margin: 0; font-family: var(--titre); font-size: 30px; }
+.pastilles { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.pastille { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--bord); background: var(--panneau); font-weight: 700; }
+.pastille.fait { background: #173a2a; border-color: #2c6b4b; color: #8ff0bd; }
+.pastille.courant { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: 0; color: #fff; }
+.carte { background: rgba(18,16,42,.75); border: 1px solid var(--bord); border-radius: 22px; padding: 22px; }
+.commandes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.vide { text-align: center; color: var(--doux); padding: 60px 20px; font-size: 18px; }
+.reponse { text-align: center; font-family: var(--titre); }
+.reponse .t { font-size: 44px; font-weight: 700; background: linear-gradient(90deg, #fff, #ffc6e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.reponse .a { font-size: 26px; color: var(--doux); }
+.reponse.apparait { animation: pop .5s cubic-bezier(.2,1.6,.4,1); }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+.compteur { color: var(--doux); font-size: 14px; }
+.grand-message { text-align: center; font-family: var(--titre); font-size: 56px; font-weight: 700; }
+
+/* Nuage */
+.nuage { position: relative; flex: 1; min-height: 320px; border-radius: 24px; overflow: hidden;
+  background: radial-gradient(ellipse at center, rgba(124,92,255,.18), rgba(9,8,22,.2) 70%); border: 1px solid var(--bord); }
+.nuage .mot { position: absolute; font-family: var(--titre); font-weight: 700; white-space: nowrap; line-height: 1.05; text-shadow: 0 0 22px currentColor; }
+.nuage .mot.apparait { animation: motIn .6s cubic-bezier(.2,1.5,.4,1); }
+@keyframes motIn { from { transform: scale(0); opacity: 0; filter: blur(8px); } }
+
+/* Paroles */
+.paroles-avant { font-size: 30px; line-height: 1.45; text-align: center; white-space: pre-line; font-family: var(--titre); font-weight: 500; }
+.trous { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin-top: 22px; }
+.mot-trou { display: flex; gap: 4px; }
+.lettre { width: 34px; height: 48px; border-bottom: 4px solid var(--accent); display: flex; align-items: flex-end; justify-content: center;
+  font-family: var(--titre); font-size: 36px; font-weight: 700; color: var(--or); }
+.lettre.ponct { border-bottom-color: transparent; width: 14px; color: var(--texte); }
+.lettre.vue { animation: lettreIn .35s backwards; }
+@keyframes lettreIn { from { transform: translateY(-18px) scale(1.4); opacity: 0; } }
+
+/* Blind test */
+.disque-zone { display: flex; justify-content: center; align-items: center; flex: 1; min-height: 260px; flex-direction: column; gap: 20px; }
+.disque { width: 250px; height: 250px; border-radius: 50%; position: relative;
+  background: repeating-radial-gradient(circle, #15132c 0 2px, #0c0b1d 3px 5px); box-shadow: 0 0 60px rgba(124,92,255,.45), inset 0 0 0 6px #232048; }
+.disque::after { content: "?"; position: absolute; inset: 32%; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent2)); font-family: var(--titre); font-size: 52px; font-weight: 700; }
+.disque.tourne { animation: tourne 1.8s linear infinite; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+.egaliseur { display: flex; gap: 6px; height: 50px; align-items: flex-end; }
+.egaliseur i { width: 10px; background: linear-gradient(var(--accent), var(--accent2)); border-radius: 4px; height: 10%; }
+.egaliseur.actif i { animation: eq .8s ease-in-out infinite alternate; }
+.egaliseur i:nth-child(2n) { animation-delay: -.3s; } .egaliseur i:nth-child(3n) { animation-delay: -.55s; animation-duration: .6s; }
+@keyframes eq { from { height: 10%; } to { height: 100%; } }
+
+/* Karaoké */
+.karaoke-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; min-height: 280px; border-radius: 24px; border: 1px solid var(--bord); }
+.karaoke-zone.coupure { background: radial-gradient(circle, rgba(255,79,163,.35), transparent 70%); border-color: var(--accent); }
+.chrono-geant { font-family: var(--titre); font-size: 120px; font-weight: 700; line-height: 1; color: var(--or); text-shadow: 0 0 40px rgba(255,207,58,.6); }
+.aide-paroles { font-size: 26px; white-space: pre-line; text-align: center; color: var(--doux); max-width: 900px; }
+
+/* Chacun son tour */
+.artistes { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.artiste { padding: 26px 16px; border-radius: 20px; border: 1px solid var(--bord); background: linear-gradient(160deg, #221d4f, #120f2c); text-align: center; }
+.artiste:hover { border-color: var(--accent); transform: translateY(-2px); }
+.artiste b { display: block; font-family: var(--titre); font-size: 24px; margin-bottom: 6px; }
+.artiste span { color: var(--doux); font-size: 13px; }
+.tours { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tour { --c: #888; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--c); font-weight: 700; opacity: .55; }
+.tour.courant { background: var(--c); color: #111; opacity: 1; transform: scale(1.12); box-shadow: 0 0 22px var(--c); }
+.tour.elimine { opacity: .25; text-decoration: line-through; border-style: dashed; }
+.equipe-courante { text-align: center; font-family: var(--titre); font-size: 46px; font-weight: 700; color: var(--c); text-shadow: 0 0 30px color-mix(in srgb, var(--c) 60%, transparent); }
+.barre-chrono { height: 12px; border-radius: 999px; background: var(--panneau2); overflow: hidden; }
+.barre-chrono i { display: block; height: 100%; background: linear-gradient(90deg, var(--ok), var(--or), var(--ko)); transition: width .1s linear; }
+.saisie { display: flex; gap: 10px; justify-content: center; }
+.saisie input { width: min(560px, 100%); font-size: 24px; padding: 14px 18px; border-radius: 14px; border: 2px solid var(--bord); background: #0e0c22; color: #fff; }
+.saisie input:focus { outline: none; border-color: var(--accent); }
+.verdict { text-align: center; font-size: 26px; font-family: var(--titre); font-weight: 600; min-height: 40px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.verdict.ok { color: var(--ok); } .verdict.ko { color: var(--ko); } .verdict.info { color: var(--or); }
+.cites { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.cite { --c: #888; padding: 6px 12px; border-radius: 10px; background: color-mix(in srgb, var(--c) 22%, #12102a); border-left: 4px solid var(--c); font-size: 15px; animation: pop .35s; }
+
+/* ---------- Fenêtres ---------- */
+.modale { position: fixed; inset: 0; background: rgba(4,3,12,.75); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
+.modale.ouverte { display: flex; }
+.fenetre { background: #12102a; border: 1px solid var(--bord); border-radius: 22px; padding: 22px; max-width: 94vw; max-height: 92vh; overflow: auto; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.fenetre h2 { margin: 0 0 14px; font-family: var(--titre); }
+.pied { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+#qr-grand { background: #fff; padding: 14px; border-radius: 16px; width: min(380px, 70vh); margin: 0 auto; }
+.lien { font-size: 20px; text-align: center; margin: 14px 0 4px; word-break: break-all; }
+.code-salle { text-align: center; font-family: var(--titre); font-size: 34px; letter-spacing: 8px; color: var(--or); }
+.champ { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--doux); }
+.champ input, .champ textarea, .champ select { font: inherit; font-size: 15px; color: var(--texte); background: #0c0a20; border: 1px solid var(--bord); border-radius: 9px; padding: 8px 10px; }
+.champ textarea { min-height: 70px; resize: vertical; }
+.champ .avec-bouton { display: flex; gap: 6px; } .champ .avec-bouton > :first-child { flex: 1; min-width: 0; }
+.case { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+
+#editeur .fenetre { width: 1100px; height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.ed-haut { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--bord); flex-wrap: wrap; }
+.ed-haut h2 { margin: 0 auto 0 0; }
+.ed-corps { flex: 1; display: grid; grid-template-columns: 210px 1fr; min-height: 0; }
+.ed-onglets { border-right: 1px solid var(--bord); padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.ed-contenu { overflow: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.ed-apercu { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-top: 1px solid var(--bord); background: #0c0a20; font-size: 13px; color: var(--doux); }
+.ed-apercu input[type=range] { flex: 1; accent-color: var(--accent); }
+.ed-reglages { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; background: var(--panneau2); border-radius: 14px; padding: 12px; }
+.ed-item { background: var(--panneau2); border: 1px solid var(--bord); border-radius: 14px; padding: 12px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.ed-item .ed-item-tete { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; }
+.ed-item .ed-item-tete b { margin-right: auto; font-family: var(--titre); }
+.ed-item .large { grid-column: 1 / -1; } .ed-item .demi { grid-column: span 2; }
+.mini { padding: 4px 9px; font-size: 13px; border-radius: 8px; }
+.note { font-size: 13px; color: var(--doux); }
+
+#toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #2a2458; border: 1px solid #5a4aa8; padding: 10px 18px; border-radius: 12px; z-index: 99; display: none; max-width: 80vw; }
+#toast.vu { display: block; animation: descend .2s; }
+#fin-manche { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 40; background: rgba(4,3,12,.7); }
+#fin-manche.vu { display: flex; }
+#fin-manche div { font-family: var(--titre); font-size: 64px; font-weight: 700; text-align: center; color: var(--c); text-shadow: 0 0 40px var(--c); animation: pop .6s cubic-bezier(.2,1.6,.4,1); }
+#fin-manche small { display: block; font-size: 22px; color: var(--doux); text-shadow: none; margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<header id="barre">
+  <div id="logo">🎵 Quiz musical</div>
+  <div id="lumieres"></div>
+  <div id="actions">
+    <span id="reseau" class="ko"><b>●</b> connexion…</span>
+    <button class="btn" id="etat-buzz" title="Ouvrir / fermer les buzzers (B)">🔔 Buzzers ouverts</button>
+    <button class="btn" id="btn-rearmer" title="Réarmer les buzzers (R)">↺ Réarmer<kbd>R</kbd></button>
+    <button class="btn" id="btn-rejoindre">📱 Rejoindre</button>
+    <button class="btn" id="btn-equipes">👥 Équipes</button>
+    <button class="btn plein" id="btn-preparer">✏️ Préparer</button>
+  </div>
+</header>
+
+<nav id="categories">
+  <h3>Catégories</h3>
+  <div id="liste-cats"></div>
+  <div id="musique-etat"></div>
+  <div id="rejoindre-mini" title="Afficher en grand">
+    <div class="qr" id="qr-mini"></div>
+    <small>Scannez pour buzzer<br>Salle <b id="salle-mini"></b></small>
+  </div>
+</nav>
+
+<main id="scene">
+  <div id="main-a"><div class="qui"></div>
+    <button class="btn vert gros" id="btn-bonne">✓ Bonne réponse<kbd>V</kbd></button>
+    <button class="btn rouge gros" id="btn-mauvaise">✗ Mauvaise<kbd>X</kbd></button>
+  </div>
+  <div id="jeu"></div>
+  <div id="lecteur">
+    <button id="btn-lecture" title="Lecture / pause (Espace)">▶</button>
+    <span id="temps">0:00</span>
+    <input type="range" id="progression" min="0" max="1000" value="0">
+    <span id="duree">0:00</span>
+    🔊 <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    <label title="Met la musique en pause dès qu'une équipe buzze"><input type="checkbox" id="pause-auto" checked> Pause au buzz</label>
+  </div>
+  <div id="flash"></div>
+</main>
+
+<aside id="scores">
+  <h3>Scores</h3>
+  <div id="liste-scores" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div id="aide-clavier">
+    <b>Raccourcis</b><br>
+    Espace : lecture / pause<br>
+    R : réarmer · B : ouvrir/fermer<br>
+    V : bonne réponse · X : mauvaise<br>
+    ← → : chanson précédente / suivante<br>
+    1 à 9 : +1 point à l'équipe n°<br>
+    Maj + 1 à 9 : −1 point
+  </div>
+</aside>
+
+<audio id="audio" preload="auto"></audio>
+<input type="file" id="input-dossier" webkitdirectory multiple hidden>
+<input type="file" id="input-import" accept=".json,application/json" hidden>
+
+<div class="modale" id="modale-rejoindre"><div class="fenetre" style="width:520px">
+  <h2>📱 Rejoindre le jeu</h2>
+  <div id="qr-grand"></div>
+  <div class="lien" id="lien-buzzer"></div>
+  <div class="code-salle" id="code-salle"></div>
+  <p class="note" id="note-rejoindre" style="text-align:center">Chaque joueur scanne le QR code, tape son prénom et choisit la couleur de son équipe. Wi-Fi ou 4G, peu importe.</p>
+  <div class="pied"><button class="btn" id="btn-nouvelle-salle" title="Change le code : les téléphones devront rescanner">Nouveau code</button><button class="btn plein" data-fermer>Fermer</button></div>
+</div></div>
+
+<div class="modale" id="modale-equipes"><div class="fenetre" style="width:560px">
+  <h2>👥 Équipes</h2>
+  <div id="liste-equipes-ed" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div class="pied" style="justify-content:space-between">
+    <div style="display:flex;gap:8px"><button class="btn" id="btn-ajout-equipe">+ Ajouter une équipe</button><button class="btn" id="btn-zero">Scores à zéro</button></div>
+    <div style="display:flex;gap:8px"><button class="btn" data-fermer>Annuler</button><button class="btn plein" id="btn-valider-equipes">Enregistrer</button></div>
+  </div>
+</div></div>
+
+<div class="modale" id="editeur"><div class="fenetre">
+  <div class="ed-haut">
+    <h2>✏️ Préparer les jeux</h2>
+    <button class="btn" id="ed-dossier">📁 Dossier musique</button>
+    <button class="btn" id="ed-export" title="Sauvegarder la préparation dans un fichier">⬇ Exporter</button>
+    <button class="btn" id="ed-import" title="Charger une préparation">⬆ Importer</button>
+    <button class="btn" data-fermer>Annuler</button>
+    <button class="btn plein" id="ed-enregistrer">Enregistrer</button>
+  </div>
+  <div class="ed-corps"><div class="ed-onglets" id="ed-onglets"></div><div class="ed-contenu" id="ed-contenu"></div></div>
+  <div class="ed-apercu">
+    <button class="btn mini" id="ap-lecture">▶</button><span id="ap-nom">Écoute : aucune</span>
+    <input type="range" id="ap-prog" min="0" max="1000" value="0"><span id="ap-temps">0:00</span>
+    <span class="note">⏱ sur un champ = prendre le temps de l'écoute</span>
+  </div>
+</div></div>
+<audio id="audio-apercu" preload="auto"></audio>
+
+<div id="fin-manche"><div></div></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script>
+'use strict';
+// =====================================================================
+//  Utilitaires
+// =====================================================================
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, props, ...enfants) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'value') e.value = v;
+    else if (k === 'style') e.setAttribute('style', v);
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'html') e.innerHTML = v;
+    else if (typeof v !== 'string' && k in e) e[k] = v;
+    else e.setAttribute(k, v);
+  }
+  for (const c of enfants.flat()) { if (c == null || c === false) continue; e.append(c.nodeType ? c : document.createTextNode(String(c))); }
+  return e;
+}
+const fmt = s => { s = Math.max(0, s || 0); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
+const lire = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (_) { return d; } };
+const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} };
+const melanger = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let toastT;
+function toast(msg, ms = 3200) { const t = $('#toast'); t.textContent = msg; t.classList.add('vu'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('vu'), ms); }
+function ouvrirModale(id) { $('#' + id).classList.add('ouverte'); }
+function fermerModale(id) { $('#' + id).classList.remove('ouverte'); if (id === 'editeur') { $('#audio-apercu').pause(); } }
+document.querySelectorAll('[data-fermer]').forEach(b => b.onclick = () => fermerModale(b.closest('.modale').id));
+
+// =====================================================================
+//  Configuration des jeux (modifiable dans « Préparer »)
+// =====================================================================
+const CONFIG_DEFAUT = {
+  nuage: { intervalle: 3, aleatoire: false, chansons: [
+    { titre: 'Chanson exemple', artiste: 'À remplacer', fichier: '', debut: 0, mots: 'soleil\nroute\nguitare\nété\ndanser\ncœur\nnuit\nrefrain' }
+  ] },
+  paroles: { chansons: [
+    { titre: 'Chanson 1', artiste: '', fichier: '', debut: 0, arret: 30, avant: '(paroles affichées juste avant l’arrêt)', reponse: 'paroles à trouver' }
+  ] },
+  blindtest: { chansons: [ { titre: 'Extrait 1', artiste: '', fichier: '', debut: 0 } ] },
+  karaoke: { chansons: [ { titre: 'Chanson 1', artiste: '', fichier: '', debut: 0, coupure: 30, duree: 8, aide: '' } ] },
+  chacun: { version: 2, duree_tour: 20, point_par_titre: true, elimination: true, artistes: [{"nom": "Francis Cabrel", "titres": ["Je l'aime à mourir", "Petite Marie", "L'encre de tes yeux", "La dame de Haute-Savoie", "Sarbacane", "C'est écrit", "Octobre", "Hors-saison", "Tout le monde y pense", "Animal", "Les murs de poussière", "Carte postale", "Encore et encore", "Je pense encore à toi", "Rosie", "Samedi soir sur la Terre", "La corrida", "Assis sur le rebord du monde", "Des roses et des orties", "Le reste du temps", "Elle écoute pousser les fleurs", "Les chevaliers cathares", "Répondez-moi", "Leïla", "Il faudra leur dire", "La fille qui m'accompagne", "Je t'aimais, je t'aime, je t'aimerai", "Presque rien", "Quelqu'un de l'intérieur", "Saïd et Mohamed", "Ma place dans le trafic", "Une star à sa façon", "Te ressembler", "Vie de chien", "Bonne nouvelle", "Cent ans de plus", "L'instant d'amour", "Pas trop de peine", "Je rêve", "Édition spéciale", "Un gramme de terre", "Giors", "Rockstars du Moyen Âge", "Question d'équilibre", "Tourner les hélicos", "Je te suivrai", "La cabane du pêcheur", "Le monde est sourd", "Qu'est-ce que t'en dis ?", "Tu me corresponds", "Les gens absents", "Gardien de nuit", "Le gorille", "La robe et l'échelle", "Le chêne liège", "Des hommes pareils", "Né dans le bayou", "Les cardinaux en costume", "Comme une femme", "Je te veux", "Partir pour rester", "Dur comme fer", "À chaque amour que nous ferons", "Le pays d'à côté", "Peuple des fontaines", "À l'aube revenant", "Un morceau de Sicre", "Madame n'aime pas", "Mademoiselle l'aventure", "Les chemins de traverse", "Fragile", "Photos de voyages", "Les beaux dégâts", "La quiero a morir", "La complainte de la butte (avec Patrick Bruel)", "Tout reste à faire (avec Souad Massi)", "Sueño (avec les Gipsy Kings)", "Lucie (avec Nolwenn Leroy)", "Les filles, à quoi ça sert ? (avec Bénabar, Goldman et Souchon)", "Vengo a ofrecer mi corazón (avec Mercedes Sosa)"]}, {"nom": "Gims", "titres": ["Bella", "Sapés comme jamais (avec Niska)", "Est-ce que tu m'aimes ?", "J'me tire", "Zombie", "Changer", "Ma beauté", "Hola Señorita (avec Maluma)", "Caméléon", "Miami Vice", "Corazón (avec Lil Wayne et French Montana)", "Le pire", "Laissez passer", "Ciel", "Reste (avec Sting)", "La même (avec Vianney)", "Tout donner", "Brisé", "Après vous madame (avec Soolking)", "Loin (avec Dany Synthé)", "Sois pas timide", "Spider (avec Dystinct)", "Origami (avec XNilo)", "Habibi", "Warano Style", "Tu vas me manquer", "Je te pardonne (avec Sia)", "Zoum Zoum (avec Djuna Family)", "Boucan (avec Jul)", "Marabout", "Mi Gna (avec Super Sako et Hayko)", "Loup garou (avec Sofiane)", "Anakin", "Oulala", "Ceci n'est pas du rap (avec Niro)", "Le prix à payer", "Entre nous c'est mort", "10/10 (avec Dadju et Alonzo)", "Malheur, malheur", "Yolo", "Immortel", "Oro Jackson (avec Gazo)", "Jusqu'ici tout va bien", "Belle (avec Dadju et Slimane)", "GJS (avec Jul et SCH)", "Only You (avec Dhurata Dora)", "Prends ma main (avec Vitaa)", "Maintenant", "Seya (avec Morad)", "Loco (avec Lossa)", "Ohma Tokita", "Ninao", "Baby", "Touché (avec KeBlack)", "Piano (avec Werenoi)", "Appelle ta copine", "Air Force blanche (avec Jul)", "Parisienne (avec La Mano 1.9)", "Tu me rends bête (avec Damso)", "Bloqué (avec L2B)", "Sentimental", "Spa (avec Theodora)", "T'avais raison (avec Maes)", "Soleil", "Pas de nouvelle bonne nouvelle (avec DJ Abdel et Black M)", "Ma mélodie (avec Dry)", "One Shot (avec Dry)", "Coucou (avec Colonel Reyel)", "Fin de dream (avec H Magnum)", "AVF (avec Stromae et Orelsan)", "Game Over (avec Vitaa)", "Longueur d'avance (avec Booba)", "Dans son sac (avec Alonzo)", "Petit jaloux (avec Lacrim)", "Elle avait son djo (avec Niska)", "Ce soir ne sors pas (avec Lacrim)", "Par amour (avec Dadju)", "Ma fierté (avec Dadju)", "Christophe (avec Orelsan)", "Bella ciao (avec Vitaa, Dadju et Slimane)", "Baden Baden (avec SCH)", "Dernier métro (avec Kendji Girac)", "César (avec Black M)", "Carré OK (avec Soolking)", "Meurtre par strangulation", "VQ2PQ", "La chute", "Épuisé", "À la base", "Pas touché (avec Pitbull)", "Melynda Gates", "Longue vie (avec Lefa)", "Hasta luego", "Mon cœur avait raison", "Cadeaux", "ABCD", "La main du roi", "Sans rétro (avec Dadju)", "Paname", "Pense à moi", "Tu ne le vois pas (avec Dadju)", "La nuit c'est fait pour dormir (avec Orelsan)", "Appelez la police (avec MHD)", "Tant pis", "Fuegolando", "Laissez-moi tranquille", "Tu reviendras", "Merci maman", "T'es partie", "Bonita", "Où aller", "Gunshot", "Tu me l'avais promis", "60 %", "Je t'en veux", "Les roses ont des épines", "Pirate (avec J Balvin)", "En secret (avec Vitaa)", "Jasmine", "Naïf", "Comme une ombre", "Mets-moi bien", "Te quiero (avec DJ Assad)", "Sicario (avec Heuss l'Enfoiré)", "Jetez pas l'œil (avec Vald)", "C'est comme ça", "Thomas Shelby", "Mirage (avec Ozuna)", "Terminal 2F (avec Dadju)", "San Goku", "Diana", "Arhbo (avec Ozuna)", "Le firmament (avec Vianney)"]}, {"nom": "Vianney", "titres": ["Pas là", "Je te déteste", "Veronica", "Les gens sont méchants", "On est bien comme ça", "Idées blanches", "Notre-Dame-des-Oiseaux", "Je m'en vais", "Moi aimer toi", "Dumbo", "Si on chantait", "Le fils à papa", "J'm'en fous", "Sans le dire", "N'attendons pas", "Beau-papa", "Pour de vrai", "Merci pour ça", "Tout nu dans la neige", "Dabali", "Les imbéciles", "Quand j'étais chanteur", "Les filles d'aujourd'hui (avec Joyce Jonathan)", "La même (avec Gims)", "Chanson sur ma drôle de vie (avec Véronique Sanson)", "Allez reste (avec Boulevard des Airs)", "Comment on fait (avec Zazie)", "L'antidote (avec Ben Mazué)", "Je suis fou (avec Kendji Girac et Soprano)", "Il faudrait (avec Bigflo & Oli)", "Le départ (avec MC Solaar)", "Maintenant (avec Renaud)", "Call on Me (avec Ed Sheeran)", "Ne me changez pas (avec Janie)", "Le feu (avec Kendji Girac)", "Le firmament (avec Gims)", "Keep It Simple (avec Mika)", "La vie m'suffit (avec Jean-Louis Aubert)", "Tu me guéris (avec Mentissa)", "Un homme (avec Florent Pagny)", "Shifting Paradigms (avec Charlie Winston)", "Too Late (avec Aiden)", "Debout (avec Eric Devillers)", "À ta santé (avec Soprano)", "Where Do I Go (avec Rosa Linn)", "Loin de moi (avec Nej')", "La fierté (avec Gazo)", "D'or et d'étain", "J'ai menti", "Pourquoi papa"]}, {"nom": "Stromae", "titres": ["Alors on danse", "Papaoutai", "Formidable", "Tous les mêmes", "Ta fête", "Quand c'est ?", "Carmen", "Te quiero", "House'llelujah", "Peace or Violence", "Bâtard", "Humain à l'eau", "Ave Cesaria", "Sommeil", "Racine carrée", "Moules frites", "Merci", "Santé", "L'enfer", "Fils de joie", "La solassitude", "Invaincu", "Riez", "Bienvenue chez moi", "Je cours", "Pas vraiment", "Mauvaise journée", "Bonne journée", "Déclaration", "C'est que du bonheur", "Défiler", "Silence", "Rail de musique", "Up Saw Liz", "Enfants de l'an 2000", "Faut qu't'arrêtes le rap (avec J.E.D.I.)", "Mon amour (avec Camila Cabello)", "AVF (avec Gims et Orelsan)", "Ma meilleure ennemie (avec Pomme)", "Que ce soit clair (avec Paul Kalkbrenner)", "Des fleurs (avec Tove Lo)", "Comme dab (avec Vitaa)", "La pluie (avec Orelsan)", "Arabesque (avec Coldplay)", "Pardon (avec Burna Boy)", "Meltdown (avec Lorde, Pusha T, Q-Tip et Haim)", "Putain putain (avec Arno)", "My Sins Are My Savior (avec Madonna)", "La place du roi (avec Seriak)", "Ghetto (avec Kery James)", "Hello Shadow (avec Kiesza)"]}, {"nom": "Johnny Hallyday", "titres": ["Que je t'aime", "Allumer le feu", "L'envie", "Quelque chose de Tennessee", "Gabrielle", "Je te promets", "Vivre pour le meilleur", "Marie", "Requiem pour un fou", "Le pénitencier", "Retiens la nuit", "Noir c'est noir", "Toute la musique que j'aime", "Ma gueule", "Diego libre dans sa tête", "Laura", "Mirador", "Souvenirs, souvenirs", "Da dou ron ron", "Viens danser le twist", "L'idole des jeunes", "Pour moi la vie va commencer", "Si j'étais un charpentier", "J'oublierai ton nom (avec Carmel)", "Tous ensemble", "Sang pour sang", "Derrière l'amour", "Elle m'oublie", "Je suis né dans la rue", "Hey Joe", "Excuse-moi partenaire", "Rock'n'roll attitude", "Le chanteur abandonné", "Poème sur la 7e", "Je t'attends", "Mon plus beau Noël", "Ne m'oublie pas", "Seul", "Fils de personne", "On a tous besoin d'amour (avec Clémence)", "J'en parlerai au diable", "Mon pays c'est l'amour", "Je veux te graver dans ma vie", "Ça n'finira jamais", "Oh ! ma jolie Sarah", "Elle est terrible", "Le bon temps du rock'n'roll", "T'aimer follement", "Les mauvais garçons", "Dis-lui que j'en rêve", "Quand revient la nuit", "Johnny lui dit adieu", "Mes yeux sont fous", "Mon anneau d'or", "Cheveux longs et idées courtes", "Je l'aime", "Le diable me pardonne", "San Francisco", "Amour d'été", "Les chevaliers du ciel", "Petite fille", "Entre mes mains", "L'histoire de Bonnie and Clyde", "À tout casser", "Rivière... ouvre ton lit", "Fumée", "Ceux que l'amour a blessés", "Deux amis pour un amour", "Jésus Christ", "Essayez", "Comme si je devais mourir demain", "J'en mettrais pas ma main au feu", "Rien n'vaut cette fille-là", "Tu peux partir si tu le veux", "J'ai un problème (avec Sylvie Vartan)", "Comme un corbeau blanc", "Noël interdit", "Le feu", "Je t'aime, je t'aime, je t'aime", "Johnny Rider", "Prends ma vie", "À l'hôtel des cœurs brisés", "Hey lovely lady", "La terre promise", "C'est la vie", "Le cœur en deux", "Revoilà ma solitude", "J'ai oublié de vivre", "La fin du voyage", "Qu'est-ce que tu croyais", "À partir de maintenant", "La fille de l'hiver", "Chez Madame Lolita", "Excusez-moi de chanter encore du rock'n'roll", "Je t'ai aimée", "J'en ai marre", "Je suis victime de l'amour", "Mon Amérique à moi", "Montpellier", "Cartes postales d'Alabama", "L'amour violent", "Pour ceux qui s'aiment", "Mon p'tit loup", "Rien à personne", "Aimer vivre", "Si j'étais moi", "Les vautours", "Himalaya", "Cadillac", "Je ne suis pas un héros", "Ça ne change pas un homme", "Dans un an ou un jour", "Et puis je sais", "Laisse les filles", "La guitare fait mal", "Je serai là", "J'la croise tous les matins", "Quand le masque tombe", "Rester libre", "L'hymne à l'amour", "Tes tendres années", "La ville des âmes en peine", "Ce que je sais", "Debout", "Un jour viendra", "Partie de cartes", "Pardon", "Ô Carole", "Serre la main d'un fou", "Douce violence", "Quelques cris", "Pauvres diables", "Ne reviens pas", "L'instinct", "Je n'ai jamais pleuré", "Tout au bout de nos peines (avec Isabelle Boulay)", "Ma religion dans son regard", "La paix", "La loi du silence", "La quête", "Si mon cœur", "Et maintenant", "Jamais seul", "Je viendrai te chercher (avec Patrick Fiori)", "La douceur de vivre", "Guitar Hero", "Autoportrait", "L'attente", "20 ans", "Un jour l'amour te trouvera", "Regarde-nous", "Rester vivant", "Te manquer", "De l'amour", "Pardonne-moi", "Love Affair (avec Kathy Mattea)", "Fool for Love (avec Michael Bolton)", "L'amour peut prendre froid (avec Céline Dion)", "Unchained Melody (avec Joss Stone)", "Jeune pour toujours (avec Hugues Aufray)", "Come il sole all'improvviso (avec Laura Pausini)", "Imagine (avec Laeticia Hallyday)", "Apprendre à vivre ensemble (avec Nanette Workman)", "Il faut savoir (avec Charles Aznavour)", "Mama (avec Zucchero)", "Cerbatana (avec Loquillo)", "Le temps passe (avec Ministère Amer et Doc Gynéco)"]}] }
+};
+let CONFIG = lire('quiz-config', null) || JSON.parse(JSON.stringify(CONFIG_DEFAUT));
+for (const k of Object.keys(CONFIG_DEFAUT)) if (!CONFIG[k]) CONFIG[k] = JSON.parse(JSON.stringify(CONFIG_DEFAUT[k]));
+// Mise à jour des listes d'artistes pour une préparation déjà enregistrée : ajoute les titres manquants, sans rien supprimer
+if ((CONFIG.chacun.version || 1) < CONFIG_DEFAUT.chacun.version) {
+  const base = t => String(t || '').replace(/\([^)]*\)/g, ' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
+  CONFIG.chacun.artistes = CONFIG.chacun.artistes || [];
+  for (const def of CONFIG_DEFAUT.chacun.artistes) {
+    const a = CONFIG.chacun.artistes.find(x => base(x.nom) === base(def.nom) || (base(def.nom) === 'gims' && base(x.nom) === 'maitregims'));
+    if (!a) { CONFIG.chacun.artistes.push(JSON.parse(JSON.stringify(def))); continue; }
+    if (base(def.nom) === 'gims') a.nom = def.nom;
+    const deja = new Set((a.titres || []).map(base));
+    a.titres = (a.titres || []).concat(def.titres.filter(d => !deja.has(base(d))));
+  }
+  CONFIG.chacun.version = CONFIG_DEFAUT.chacun.version;
+  ecrire('quiz-config', CONFIG);
+}
+
+// =====================================================================
+//  Équipes, scores et buzzers
+// =====================================================================
+const EQUIPES_DEFAUT = [
+  { id: 'rouge', nom: 'Rouge', couleur: '#ff3b5c', score: 0 }, { id: 'bleu', nom: 'Bleu', couleur: '#2f8cff', score: 0 },
+  { id: 'vert', nom: 'Vert', couleur: '#22d36b', score: 0 }, { id: 'jaune', nom: 'Jaune', couleur: '#ffd21f', score: 0 }];
+let equipes = lire('quiz-equipes', null) || EQUIPES_DEFAUT.map(e => ({ ...e }));
+const buzz = { ouvert: true, ordre: [], exclues: [], manche: 1 };
+const equipe = id => equipes.find(e => e.id === id);
+let pauseParBuzz = false, jeuCourant = null, glisse = false;
+
+function sauverEquipes() { ecrire('quiz-equipes', equipes); }
+function rearmer() { buzz.ordre = []; buzz.exclues = []; buzz.ouvert = true; buzz.manche++; pauseParBuzz = false; majBuzz(); }
+function ajouterPoints(id, delta) {
+  const e = equipe(id); if (!e) return;
+  e.score += delta; sauverEquipes(); renduScores(id); diffuser();
+}
+
+function recevoirBuzz(id, joueur) {
+  if (!equipe(id) || !buzz.ouvert || buzz.exclues.includes(id) || buzz.ordre.some(b => b.equipe === id)) return;
+  buzz.ordre.push({ equipe: id, joueur: String(joueur || '').slice(0, 20), t: Date.now() });
+  bip(id, buzz.ordre.length === 1);
+  if (buzz.ordre.length === 1) surPremierBuzz();
+  majBuzz();
+}
+function surPremierBuzz() {
+  const e = equipe(buzz.ordre[0].equipe);
+  const f = $('#flash'); f.style.setProperty('--c', e.couleur); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+  if (jeuCourant && jeuCourant.pauseAuBuzz !== false && $('#pause-auto').checked && !audio.paused) { audio.pause(); pauseParBuzz = true; }
+  jeuCourant && jeuCourant.surBuzz && jeuCourant.surBuzz(e.id);
+}
+function bonneReponse() {
+  const p = buzz.ordre[0]; if (!p) return;
+  ajouterPoints(p.equipe, 1);
+  const reprendre = pauseParBuzz;
+  rearmer();
+  jeuCourant && jeuCourant.surBonne && jeuCourant.surBonne(p.equipe, reprendre);
+}
+function mauvaiseReponse() {
+  const p = buzz.ordre.shift(); if (!p) return;
+  buzz.exclues.push(p.equipe);
+  bipErreur();
+  const fileVide = buzz.ordre.length === 0;
+  if (!fileVide) { bip(buzz.ordre[0].equipe, true); surPremierBuzz(); }
+  else if (pauseParBuzz) { pauseParBuzz = false; audio.play().catch(() => {}); }
+  jeuCourant && jeuCourant.surMauvaise && jeuCourant.surMauvaise(fileVide);
+  majBuzz();
+}
+
+function majBuzz() { renduLumieres(); renduMain(); diffuser();
+  const b = $('#etat-buzz'); b.textContent = buzz.ouvert ? '🔔 Buzzers ouverts' : '🔕 Buzzers fermés'; b.classList.toggle('ferme', !buzz.ouvert); }
+
+function renduLumieres() {
+  const box = $('#lumieres'); box.innerHTML = '';
+  const tel = nbTelephones();
+  equipes.forEach(e => {
+    const rang = buzz.ordre.findIndex(b => b.equipe === e.id);
+    const l = h('div', { class: 'lampe' + (rang >= 0 ? ' allumee' : '') + (rang === 0 ? ' premiere' : '') + (buzz.exclues.includes(e.id) ? ' exclue' : ''), style: '--c:' + e.couleur },
+      h('div', { class: 'bulbe' }), h('div', { class: 'nom' }, e.nom),
+      tel[e.id] ? h('span', { class: 'tel', title: 'téléphones connectés' }, '📱' + tel[e.id]) : null,
+      rang >= 0 ? h('span', { class: 'rang' }, rang + 1) : null);
+    box.append(l);
+  });
+}
+function renduMain() {
+  const m = $('#main-a'), p = buzz.ordre[0];
+  if (!p || !equipe(p.equipe)) { m.classList.remove('visible'); return; }
+  const e = equipe(p.equipe);
+  m.style.setProperty('--c', e.couleur);
+  $('.qui', m).innerHTML = '';
+  $('.qui', m).append('🔔 Équipe ' + e.nom + ' ', p.joueur ? h('small', {}, '· ' + p.joueur) : '',
+    buzz.ordre.length > 1 ? h('small', {}, '   (ensuite : ' + buzz.ordre.slice(1).map(b => (equipe(b.equipe) || {}).nom).join(', ') + ')') : '');
+  m.classList.add('visible');
+}
+function renduScores(bumpId) {
+  const box = $('#liste-scores'); box.innerHTML = '';
+  const max = Math.max(...equipes.map(e => e.score));
+  equipes.forEach((e, i) => {
+    box.append(h('div', { class: 'ligne-score' + (max > 0 && e.score === max ? ' tete' : '') + (bumpId === e.id ? ' bump' : ''), style: '--c:' + e.couleur },
+      h('div', { class: 'couleur' }),
+      h('div', { class: 'milieu' }, h('div', { class: 'nom' }, e.nom), h('div', { class: 'val' }, e.score)),
+      h('div', { class: 'boutons' },
+        h('button', { title: '+1 (touche ' + (i + 1) + ')', onclick: () => ajouterPoints(e.id, 1) }, '+'),
+        h('button', { title: '−1', onclick: () => ajouterPoints(e.id, -1) }, '−'))));
+  });
+}
+
+// Sons d'ambiance (générés, aucun fichier)
+let ctxAudio;
+function sonner(freqs, duree = .18, type = 'square', vol = .18) {
+  try {
+    ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)();
+    if (ctxAudio.state === 'suspended') ctxAudio.resume();
+    let t = ctxAudio.currentTime;
+    for (const f of freqs) {
+      const o = ctxAudio.createOscillator(), g = ctxAudio.createGain();
+      o.type = type; o.frequency.value = f; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + duree);
+      o.connect(g).connect(ctxAudio.destination); o.start(t); o.stop(t + duree); t += duree * .8;
+    }
+  } catch (_) {}
+}
+function bip(id, premier) { const i = Math.max(0, equipes.findIndex(e => e.id === id)); const f = 440 * Math.pow(2, (i * 3) / 12); sonner(premier ? [f, f * 1.5, f * 2] : [f], premier ? .16 : .1, 'square', premier ? .2 : .08); }
+function bipErreur() { sonner([220, 160], .25, 'sawtooth', .15); }
+document.addEventListener('pointerdown', () => { try { ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)(); ctxAudio.resume(); } catch (_) {} }, { once: true });
+
+// =====================================================================
+//  Connexion des smartphones (PeerJS / WebRTC)
+// =====================================================================
+const LETTRES = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+let SALLE = lire('quiz-salle', null);
+if (!SALLE) { SALLE = Array.from({ length: 5 }, () => LETTRES[Math.floor(Math.random() * LETTRES.length)]).join(''); ecrire('quiz-salle', SALLE); }
+let peer = null, relanceP = null;
+const conns = new Set();
+
+function lienBuzzer() { return new URL('buzzer.html?salle=' + SALLE, location.href).href; }
+function nbTelephones() { const n = {}; for (const c of conns) if (c.open && c.equipe) n[c.equipe] = (n[c.equipe] || 0) + 1; return n; }
+function etatPublic() { return { equipes: equipes.map(e => ({ id: e.id, nom: e.nom, couleur: e.couleur })), buzz }; }
+function diffuser() { const m = { type: 'etat', etat: etatPublic() }; for (const c of conns) if (c.open) { try { c.send(m); } catch (_) {} } }
+function statutReseau(txt, ok) { const r = $('#reseau'); r.innerHTML = '<b>●</b> ' + txt; r.classList.toggle('ko', !ok); }
+function majReseau() { const n = [...conns].filter(c => c.open).length; statutReseau(n + ' téléphone' + (n > 1 ? 's' : ''), true); renduLumieres(); }
+
+function demarrerPeer() {
+  if (typeof Peer === 'undefined') { statutReseau('hors ligne (pas d’Internet)', false); return; }
+  if (peer) { try { peer.destroy(); } catch (_) {} }
+  statutReseau('connexion…', false);
+  peer = new Peer('quizmusical-' + SALLE, { debug: 0 });
+  peer.on('open', () => majReseau());
+  peer.on('disconnected', () => { statutReseau('reconnexion…', false); setTimeout(() => { try { peer.reconnect(); } catch (_) {} }, 1500); });
+  peer.on('error', err => {
+    if (err.type === 'unavailable-id') statutReseau('code de salle occupé, nouvel essai…', false);
+    else if (err.type === 'peer-unavailable') return;
+    else statutReseau('réseau : ' + err.type, false);
+    clearTimeout(relanceP); relanceP = setTimeout(demarrerPeer, 4000);
+  });
+  peer.on('connection', c => {
+    c.equipe = '';
+    c.on('open', () => { conns.add(c); try { c.send({ type: 'etat', etat: etatPublic() }); } catch (_) {} majReseau(); });
+    c.on('data', d => {
+      if (!d || typeof d !== 'object') return;
+      if (d.type === 'hello') { c.equipe = String(d.equipe || ''); c.send({ type: 'etat', etat: etatPublic() }); majReseau(); }
+      if (d.type === 'buzz') { c.equipe = String(d.equipe || c.equipe); recevoirBuzz(c.equipe, d.joueur); if (buzz.ordre.length === 0) c.send({ type: 'etat', etat: etatPublic() }); }
+    });
+    const fin = () => { conns.delete(c); majReseau(); };
+    c.on('close', fin); c.on('error', fin);
+  });
+}
+function dessinerQR() {
+  const u = lienBuzzer();
+  $('#salle-mini').textContent = SALLE; $('#code-salle').textContent = SALLE; $('#lien-buzzer').textContent = u.replace(/^https?:\/\//, '');
+  if (location.protocol === 'file:') $('#note-rejoindre').innerHTML = '⚠️ La page est ouverte depuis un fichier : déposez <b>index.html</b> et <b>buzzer.html</b> sur votre hébergement pour que les téléphones puissent se connecter.';
+  if (typeof qrcode === 'undefined') { $('#qr-mini').textContent = 'QR indisponible'; $('#qr-grand').textContent = u; return; }
+  const q = qrcode(0, 'M'); q.addData(u); q.make();
+  $('#qr-mini').innerHTML = q.createSvgTag(4, 0); $('#qr-grand').innerHTML = q.createSvgTag(8, 0);
+}
+$('#btn-rejoindre').onclick = () => ouvrirModale('modale-rejoindre');
+$('#rejoindre-mini').onclick = () => ouvrirModale('modale-rejoindre');
+$('#btn-nouvelle-salle').onclick = () => {
+  if (!confirm('Changer le code de salle ? Tous les téléphones devront rescanner le QR code.')) return;
+  SALLE = Array.from({ length: 5 }, () => LETTRES[Math.floor(Math.random() * LETTRES.length)]).join(''); ecrire('quiz-salle', SALLE);
+  for (const c of conns) { try { c.close(); } catch (_) {} } conns.clear();
+  dessinerQR(); demarrerPeer();
+};
+
+// =====================================================================
+//  Musiques : dossier local de l'animateur (jamais envoyé en ligne)
+// =====================================================================
+const EXT_AUDIO = /\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|webm|mp4)$/i;
+const Musique = {
+  fichiers: new Map(), urls: new Map(), nomDossier: '', poignee: null,
+  liste() { return [...this.fichiers.keys()].sort((a, b) => a.localeCompare(b, 'fr')); },
+  trouver(nom) {
+    if (!nom) return null;
+    if (this.fichiers.has(nom)) return nom;
+    const base = nom.split('/').pop().toLowerCase();
+    return this.liste().find(k => k.split('/').pop().toLowerCase() === base) || null;
+  },
+  url(nom) {
+    const k = this.trouver(nom); if (!k) return null;
+    if (!this.urls.has(k)) this.urls.set(k, URL.createObjectURL(this.fichiers.get(k)));
+    return this.urls.get(k);
+  },
+  vider() { for (const u of this.urls.values()) URL.revokeObjectURL(u); this.urls.clear(); this.fichiers.clear(); },
+  async depuisPoignee(p) {
+    this.vider(); this.poignee = p; this.nomDossier = p.name;
+    const parcourir = async (d, base) => {
+      for await (const [nom, ent] of d.entries()) {
+        const rel = base ? base + '/' + nom : nom;
+        if (ent.kind === 'directory') await parcourir(ent, rel);
+        else if (EXT_AUDIO.test(nom)) this.fichiers.set(rel, await ent.getFile());
+      }
+    };
+    await parcourir(p, ''); majMusique();
+  },
+  depuisInput(files) {
+    this.vider(); this.poignee = null;
+    for (const f of files) {
+      if (!EXT_AUDIO.test(f.name)) continue;
+      const parts = (f.webkitRelativePath || f.name).split('/');
+      if (parts.length > 1) { this.nomDossier = parts[0]; parts.shift(); }
+      this.fichiers.set(parts.join('/'), f);
+    }
+    majMusique();
+  },
+  async choisir() {
+    if (window.showDirectoryPicker) {
+      try { const p = await showDirectoryPicker({ id: 'quiz-musique', mode: 'read' }); await bdEcrire('dossier', p); await this.depuisPoignee(p); }
+      catch (e) { if (e.name !== 'AbortError') $('#input-dossier').click(); }
+    } else $('#input-dossier').click();
+  },
+  async restaurer() {
+    try {
+      const p = await bdLire('dossier'); if (!p || !p.queryPermission) return;
+      if (await p.queryPermission({ mode: 'read' }) === 'granted') await this.depuisPoignee(p);
+      else { this.poignee = p; this.nomDossier = p.name; this.enAttente = true; majMusique(); }
+    } catch (_) {}
+  },
+  async reactiver() {
+    try { if (await this.poignee.requestPermission({ mode: 'read' }) === 'granted') { this.enAttente = false; await this.depuisPoignee(this.poignee); } } catch (_) { this.choisir(); }
+  }
+};
+$('#input-dossier').onchange = e => { Musique.depuisInput(e.target.files); e.target.value = ''; };
+function majMusique() {
+  const box = $('#musique-etat'); box.innerHTML = '';
+  if (Musique.enAttente) box.append('📁 ', h('b', {}, Musique.nomDossier), h('br'), h('button', { class: 'btn mini', style: 'margin-top:6px', onclick: () => Musique.reactiver() }, 'Réactiver le dossier'));
+  else if (Musique.fichiers.size) box.append('📁 ', h('b', {}, Musique.nomDossier || 'Musiques'), ' · ' + Musique.fichiers.size + ' titres', h('br'), h('a', { href: '#', style: 'color:var(--doux);font-size:12px', onclick: e => { e.preventDefault(); Musique.choisir(); } }, 'changer'));
+  else box.append(h('button', { class: 'btn', onclick: () => Musique.choisir() }, '📁 Charger les musiques'), h('div', { style: 'margin-top:6px' }, 'le dossier de MP3 de cet ordinateur'));
+  if ($('#editeur').classList.contains('ouverte')) renduEditeur();
+}
+// petite base IndexedDB pour se souvenir du dossier
+function bd() { return new Promise((ok, ko) => { const r = indexedDB.open('quiz-musical', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); }); }
+async function bdEcrire(k, v) { const d = await bd(); return new Promise(ok => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = ok; t.onerror = ok; }); }
+async function bdLire(k) { const d = await bd(); return new Promise(ok => { const r = d.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); }); }
+
+// =====================================================================
+//  Lecteur audio partagé
+// =====================================================================
+const audio = $('#audio');
+const Lecteur = {
+  veilles: [],
+  async jouer(fichier, debut = 0) {
+    if (!fichier) { toast('Aucun fichier audio pour cette chanson (✏️ Préparer).'); return false; }
+    const url = Musique.url(fichier);
+    if (!url) { toast(Musique.fichiers.size ? 'Fichier introuvable dans le dossier : ' + fichier : 'Chargez d’abord le dossier des musiques (colonne de gauche).'); return false; }
+    this.veilles = []; audio.muted = false;
+    if (audio.dataset.f !== fichier) {
+      audio.src = url; audio.dataset.f = fichier;
+      await new Promise(ok => { audio.onloadedmetadata = ok; audio.onerror = ok; });
+    }
+    audio.currentTime = Number(debut) || 0;
+    try { await audio.play(); } catch (e) { toast('Lecture impossible : ' + e.message); return false; }
+    return true;
+  },
+  quand(t, cb) { this.veilles.push({ t: Number(t), cb }); },
+  stop() { audio.pause(); this.veilles = []; audio.muted = false; pauseParBuzz = false; }
+};
+function boucle() {
+  const t = audio.currentTime;
+  if (!audio.paused && Lecteur.veilles.length) {
+    const prets = Lecteur.veilles.filter(v => t >= v.t);
+    if (prets.length) { Lecteur.veilles = Lecteur.veilles.filter(v => t < v.t); prets.forEach(v => v.cb(t)); }
+  }
+  if (jeuCourant && jeuCourant.tic) jeuCourant.tic(t);
+  if (!glisse && audio.duration) $('#progression').value = Math.round(t / audio.duration * 1000);
+  $('#temps').textContent = fmt(t); $('#duree').textContent = fmt(audio.duration);
+  $('#btn-lecture').textContent = audio.paused ? '▶' : '⏸';
+  requestAnimationFrame(boucle);
+}
+$('#progression').addEventListener('input', () => { glisse = true; });
+$('#progression').addEventListener('change', e => { if (audio.duration) audio.currentTime = e.target.value / 1000 * audio.duration; glisse = false; });
+$('#volume').oninput = e => { audio.volume = e.target.value; };
+function basculerLecture() { if (!audio.src) return; if (audio.paused) { pauseParBuzz = false; audio.play().catch(() => {}); } else audio.pause(); }
+$('#btn-lecture').onclick = basculerLecture;
+
+// =====================================================================
+//  Éléments communs aux jeux
+// =====================================================================
+function enTete(titre, liste, idx, choisir, faits) {
+  return h('div', { class: 'entete-jeu' }, h('h2', {}, titre),
+    h('div', { class: 'pastilles' }, liste.map((_, i) =>
+      h('button', { class: 'pastille' + (i === idx ? ' courant' : '') + (faits && faits.has(i) ? ' fait' : ''), onclick: () => choisir(i) }, i + 1))));
+}
+const vide = () => h('div', { class: 'vide carte' }, 'Rien à jouer pour l’instant.', h('br'), h('br'), h('button', { class: 'btn plein', onclick: () => ouvrirEditeur() }, '✏️ Préparer ce jeu'));
+const blocReponse = c => h('div', { class: 'reponse apparait' }, h('div', { class: 't' }, '« ' + (c.titre || '?') + ' »'), c.artiste ? h('div', { class: 'a' }, c.artiste) : null);
+
+// ---------------- 1. Nuage de mots ----------------
+function creerNuage() {
+  const J = { id: 'nuage', nom: 'Nuage de mots', icone: '☁️' };
+  let idx = 0, racine, zone, zoneRep, timer = null, reprise = false, mots = [], n = 0, places = [], btnLancer, compteur;
+  const faits = new Set();
+  const L = () => CONFIG.nuage.chansons || [];
+  const PALETTE = ['#ff6fb5', '#9d8bff', '#4fd1ff', '#ffd166', '#7cf29c', '#ff9f5a', '#f5f3ff', '#c38bff'];
+  J.ouvrir = el => { racine = el; idx = Math.min(idx, Math.max(0, L().length - 1)); afficher(); };
+  J.quitter = () => arreter();
+  function afficher() {
+    arreter(); racine.innerHTML = '';
+    racine.append(enTete('☁️ Nuage de mots', L(), idx, i => { idx = i; afficher(); }, faits));
+    const c = L()[idx]; if (!c) { racine.append(vide()); return; }
+    mots = String(c.mots || '').split(/\n|,/).map(s => s.trim()).filter(Boolean);
+    if (CONFIG.nuage.aleatoire) mots = melanger(mots);
+    n = 0; places = [];
+    zone = h('div', { class: 'nuage' });
+    zoneRep = h('div', { style: 'min-height:90px' });
+    btnLancer = h('button', { class: 'btn plein gros', onclick: () => timer ? arreter() : lancer() }, '▶ Lancer le nuage');
+    compteur = h('span', { class: 'compteur' });
+    racine.append(zone, zoneRep, h('div', { class: 'commandes' }, btnLancer,
+      h('button', { class: 'btn gros', onclick: motSuivant }, '+1 mot'),
+      h('button', { class: 'btn gros', onclick: () => { arreter(); while (n < mots.length) motSuivant(); } }, 'Tout afficher'),
+      h('button', { class: 'btn gros', onclick: reveler }, '🎉 Révéler'),
+      h('button', { class: 'btn gros', onclick: () => J.nav(1) }, 'Suivant ▶'), compteur));
+    majCompteur();
+  }
+  function majCompteur() { if (compteur) compteur.textContent = n + ' / ' + mots.length + ' mots'; if (btnLancer) btnLancer.textContent = timer ? '⏸ Pause' : (n ? '▶ Continuer' : '▶ Lancer le nuage'); }
+  function lancer() { if (timer || n >= mots.length) return; timer = setInterval(motSuivant, Math.max(.5, Number(CONFIG.nuage.intervalle) || 3) * 1000); motSuivant(); majCompteur(); }
+  function arreter() { clearInterval(timer); timer = null; majCompteur(); }
+  function motSuivant() { if (n >= mots.length) { arreter(); return; } placer(mots[n++]); if (n >= mots.length) arreter(); majCompteur(); }
+  function chevauche(a, b) { const m = 8; return !(a.x + a.w + m < b.x || b.x + b.w + m < a.x || a.y + a.h + m < b.y || b.y + b.h + m < a.y); }
+  function placer(mot) {
+    const W = zone.clientWidth, H = zone.clientHeight;
+    const s = h('span', { class: 'mot' }, mot);
+    s.style.color = PALETTE[(n - 1) % PALETTE.length]; s.style.visibility = 'hidden';
+    zone.append(s);
+    let taille = [30, 38, 46, 56, 68, 84][Math.floor(Math.random() * 6)];
+    for (let essai = 0; essai < 7; essai++) {
+      s.style.fontSize = taille + 'px';
+      const w = s.offsetWidth, hh = s.offsetHeight, a0 = Math.random() * Math.PI * 2;
+      for (let i = 0; i < 2500; i++) {
+        const a = a0 + i * .23, r = i * 1.1;
+        const x = W / 2 + r * Math.cos(a) * 1.5 - w / 2, y = H / 2 + r * Math.sin(a) * .8 - hh / 2;
+        if (r > W) break;
+        if (x < 6 || y < 6 || x + w > W - 6 || y + hh > H - 6) continue;
+        const rect = { x, y, w, h: hh };
+        if (!places.some(p => chevauche(p, rect))) {
+          places.push(rect); s.style.left = x + 'px'; s.style.top = y + 'px'; s.style.visibility = ''; s.classList.add('apparait'); return;
+        }
+      }
+      taille = Math.round(taille * .8);
+    }
+    s.remove();
+  }
+  function reveler() {
+    arreter(); const c = L()[idx]; if (!c) return;
+    while (n < mots.length) motSuivant();
+    zoneRep.innerHTML = ''; zoneRep.append(blocReponse(c)); faits.add(idx);
+    $$pastilles(racine, idx, faits);
+    if (c.fichier) Lecteur.jouer(c.fichier, c.debut);
+  }
+  J.surBuzz = () => { if (timer) { arreter(); reprise = true; } };
+  J.surMauvaise = fileVide => { if (fileVide && reprise) { reprise = false; lancer(); } };
+  J.surBonne = () => { reprise = false; reveler(); };
+  J.nav = d => { if (!L().length) return; idx = (idx + d + L().length) % L().length; Lecteur.stop(); afficher(); };
+  return J;
+}
+function $$pastilles(racine, idx, faits) { racine.querySelectorAll('.pastille').forEach((p, i) => p.classList.toggle('fait', faits.has(i) && i !== idx)); }
+
+// ---------------- 2. Terminer les paroles ----------------
+function creerParoles() {
+  const J = { id: 'paroles', nom: 'Terminer les paroles', icone: '🎤' };
+  let idx = 0, racine, phase = 'pret', zoneTexte, zoneCmd;
+  const faits = new Set();
+  const L = () => CONFIG.paroles.chansons || [];
+  J.ouvrir = el => { racine = el; idx = Math.min(idx, Math.max(0, L().length - 1)); phase = 'pret'; afficher(); };
+  function afficher() {
+    racine.innerHTML = '';
+    racine.append(enTete('🎤 Terminer les paroles', L(), idx, i => { idx = i; phase = 'pret'; Lecteur.stop(); afficher(); }, faits));
+    const c = L()[idx]; if (!c) { racine.append(vide()); return; }
+    racine.append(h('div', { class: 'reponse' }, h('div', { class: 't', style: 'font-size:34px' }, (c.titre || 'Chanson ' + (idx + 1))), c.artiste ? h('div', { class: 'a' }, c.artiste) : null));
+    zoneTexte = h('div', { class: 'carte', style: 'flex:1;display:flex;flex-direction:column;justify-content:center;min-height:260px' });
+    zoneCmd = h('div', { class: 'commandes' });
+    racine.append(zoneTexte, zoneCmd); rendu();
+  }
+  function trous(rep, visible) {
+    let k = 0;
+    return h('div', { class: 'trous' }, String(rep || '').trim().split(/\s+/).filter(Boolean).map(mot =>
+      h('div', { class: 'mot-trou' }, [...mot].map(ch => {
+        const lettre = /[\p{L}\p{N}]/u.test(ch);
+        const d = h('span', { class: 'lettre' + (lettre ? '' : ' ponct') + (visible ? ' vue' : '') }, (visible || !lettre) ? ch : '');
+        if (visible) d.style.animationDelay = (k++ * 45) + 'ms';
+        return d;
+      }))));
+  }
+  function rendu() {
+    const c = L()[idx]; zoneTexte.innerHTML = ''; zoneCmd.innerHTML = '';
+    if (phase === 'pret' || phase === 'lecture') {
+      zoneTexte.append(h('div', { class: 'grand-message' }, phase === 'pret' ? '🎤' : '🎶 Écoutez bien…'),
+        h('p', { class: 'note', style: 'text-align:center' }, phase === 'pret' ? 'La musique s’arrêtera toute seule : il faudra chanter la suite !' : (Number(c.arret) ? 'Arrêt automatique à ' + fmt(c.arret) : 'Arrêtez la musique au bon moment')));
+    } else {
+      zoneTexte.append(h('div', { class: 'paroles-avant' }, c.avant || ''), trous(c.reponse, phase === 'revele'));
+    }
+    if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'));
+    if (phase === 'lecture') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: stopper }, '⏹ Arrêter ici'));
+    if (phase === 'stop') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: reveler }, '👀 Révéler les paroles'));
+    if (phase === 'stop' || phase === 'revele') zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { pauseParBuzz = false; audio.play().catch(() => {}); } }, '▶ Écouter la suite'));
+    if (phase !== 'pret') zoneCmd.append(h('button', { class: 'btn gros', onclick: () => { Lecteur.stop(); phase = 'pret'; rendu(); } }, '↺ Recommencer'));
+    zoneCmd.append(h('button', { class: 'btn gros', onclick: () => J.nav(1) }, 'Suivant ▶'));
+  }
+  async function lancer() {
+    const c = L()[idx];
+    if (!(await Lecteur.jouer(c.fichier, c.debut))) return;
+    phase = 'lecture'; rendu();
+    if (Number(c.arret) > 0) Lecteur.quand(c.arret, stopper);
+  }
+  function stopper() { audio.pause(); Lecteur.veilles = []; phase = 'stop'; rendu(); sonner([660, 880], .12, 'triangle', .2); }
+  function reveler() { if (phase === 'lecture') stopper(); phase = 'revele'; faits.add(idx); rendu(); $$pastilles(racine, idx, faits); }
+  J.surBonne = () => reveler();
+  J.nav = d => { if (!L().length) return; idx = (idx + d + L().length) % L().length; phase = 'pret'; Lecteur.stop(); afficher(); };
+  return J;
+}
+
+// ---------------- 3. Blind test ----------------
+function creerBlindTest() {
+  const J = { id: 'blindtest', nom: 'Blind test', icone: '🎧' };
+  let idx = 0, racine, revele = false, disque, eq, zoneRep;
+  const faits = new Set();
+  const L = () => CONFIG.blindtest.chansons || [];
+  J.ouvrir = el => { racine = el; idx = Math.min(idx, Math.max(0, L().length - 1)); afficher(); };
+  function afficher() {
+    racine.innerHTML = ''; revele = false;
+    racine.append(enTete('🎧 Blind test', L(), idx, i => { idx = i; Lecteur.stop(); afficher(); }, faits));
+    const c = L()[idx]; if (!c) { racine.append(vide()); return; }
+    disque = h('div', { class: 'disque' }); eq = h('div', { class: 'egaliseur' }, Array.from({ length: 9 }, () => h('i')));
+    zoneRep = h('div', { style: 'min-height:110px' }, h('div', { class: 'compteur', style: 'text-align:center' }, 'Extrait ' + (idx + 1) + ' / ' + L().length));
+    racine.append(h('div', { class: 'disque-zone' }, disque, eq), zoneRep,
+      h('div', { class: 'commandes' },
+        h('button', { class: 'btn plein gros', onclick: () => Lecteur.jouer(c.fichier, c.debut) }, '▶ Lancer l’extrait'),
+        h('button', { class: 'btn gros', onclick: reveler }, '🎉 Révéler'),
+        h('button', { class: 'btn gros', onclick: () => J.nav(1) }, 'Suivant ▶')));
+  }
+  function reveler() { const c = L()[idx]; if (!c || revele) return; revele = true; zoneRep.innerHTML = ''; zoneRep.append(blocReponse(c)); faits.add(idx); $$pastilles(racine, idx, faits); }
+  J.tic = () => { const joue = !audio.paused && !!audio.src; disque && disque.classList.toggle('tourne', joue); eq && eq.classList.toggle('actif', joue); };
+  J.surBonne = (_, reprendre) => { reveler(); if (reprendre) audio.play().catch(() => {}); };
+  J.nav = d => { if (!L().length) return; idx = (idx + d + L().length) % L().length; Lecteur.stop(); afficher(); };
+  return J;
+}
+
+// ---------------- 4. Karaoké « garde le rythme » ----------------
+function creerKaraoke() {
+  const J = { id: 'karaoke', nom: 'Karaoké – garde le rythme', icone: '🥁', pauseAuBuzz: false };
+  let idx = 0, racine, phase = 'pret', finCoupure = 0, scene, chrono, zoneCmd;
+  const faits = new Set();
+  const L = () => CONFIG.karaoke.chansons || [];
+  J.ouvrir = el => { racine = el; idx = Math.min(idx, Math.max(0, L().length - 1)); phase = 'pret'; afficher(); };
+  J.quitter = () => { audio.muted = false; };
+  function afficher() {
+    racine.innerHTML = '';
+    racine.append(enTete('🥁 Karaoké – garde le rythme', L(), idx, i => { idx = i; phase = 'pret'; Lecteur.stop(); afficher(); }, faits));
+    const c = L()[idx]; if (!c) { racine.append(vide()); return; }
+    racine.append(h('div', { class: 'reponse' }, h('div', { class: 't', style: 'font-size:34px' }, c.titre || 'Chanson ' + (idx + 1)), c.artiste ? h('div', { class: 'a' }, c.artiste) : null));
+    scene = h('div', { class: 'karaoke-zone' }); zoneCmd = h('div', { class: 'commandes' });
+    racine.append(scene, zoneCmd); rendu();
+  }
+  function rendu() {
+    const c = L()[idx]; scene.innerHTML = ''; zoneCmd.innerHTML = '';
+    scene.classList.toggle('coupure', phase === 'coupure');
+    if (phase === 'pret') scene.append(h('div', { class: 'grand-message' }, '🎶 Chantez avec la musique…'), h('div', { class: 'note' }, 'Le son va se couper : continuez à chanter en rythme !'));
+    if (phase === 'lecture') scene.append(h('div', { class: 'grand-message' }, '🎶 Chantez !'), h('div', { class: 'note' }, Number(c.coupure) ? 'Coupure à ' + fmt(c.coupure) : 'Coupez le son quand vous voulez'));
+    if (phase === 'coupure') { chrono = h('div', { class: 'chrono-geant' }); scene.append(h('div', { class: 'grand-message' }, '🎤 À VOUS DE CHANTER !'), chrono, c.aide ? h('div', { class: 'aide-paroles' }, c.aide) : null); }
+    if (phase === 'retour') scene.append(h('div', { class: 'grand-message' }, '🔊 Le son revient…'), h('div', { class: 'aide-paroles' }, 'Alors, toujours dans le rythme ?'));
+    zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, phase === 'pret' ? '▶ Lancer la chanson' : '↺ Relancer'));
+    if (phase === 'lecture' || phase === 'retour') zoneCmd.append(h('button', { class: 'btn gros', onclick: couper }, '🔇 Couper maintenant'));
+    if (phase === 'coupure') zoneCmd.append(h('button', { class: 'btn gros', onclick: retablir }, '🔊 Remettre le son'));
+    zoneCmd.append(h('button', { class: 'btn gros', onclick: () => J.nav(1) }, 'Suivant ▶'));
+  }
+  async function lancer() {
+    const c = L()[idx];
+    if (!(await Lecteur.jouer(c.fichier, c.debut))) return;
+    phase = 'lecture'; rendu();
+    if (Number(c.coupure) > 0) Lecteur.quand(c.coupure, couper);
+  }
+  function couper() {
+    const c = L()[idx]; if (audio.paused) audio.play().catch(() => {});
+    audio.muted = true; phase = 'coupure';
+    finCoupure = audio.currentTime + (Number(c.duree) || 8);
+    Lecteur.veilles = []; Lecteur.quand(finCoupure, retablir); rendu();
+  }
+  function retablir() { audio.muted = false; Lecteur.veilles = []; phase = 'retour'; faits.add(idx); rendu(); $$pastilles(racine, idx, faits); }
+  J.tic = t => { if (phase === 'coupure' && chrono) chrono.textContent = Math.max(0, Math.ceil(finCoupure - t)); };
+  J.nav = d => { if (!L().length) return; idx = (idx + d + L().length) % L().length; phase = 'pret'; Lecteur.stop(); afficher(); };
+  return J;
+}
+
+// ---------------- 5. Chacun son tour ----------------
+function normaliser(s) {
+  return String(s || '').toLowerCase().replace(/œ/g, 'oe').replace(/æ/g, 'ae').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/&/g, ' et ').replace(/['’`´]/g, ' ').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+const cle = s => normaliser(String(s || '').replace(/\([^)]*\)/g, ' ')).replace(/^(le|la|les|l|un|une|des|the) /, '');
+function distance(a, b) {
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  let prec = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prec[j] + 1, cur[j - 1] + 1, prec[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prec = cur; }
+  return prec[n];
+}
+function chercherTitre(saisie, titres) {
+  const q = cle(saisie); if (!q) return { type: 'aucun' };
+  let meilleur = null, dMin = Infinity, partiel = null;
+  for (const t of titres) {
+    const k = cle(t);
+    if (k === q) return { type: 'exact', titre: t };
+    const d = distance(q, k); if (d < dMin) { dMin = d; meilleur = t; }
+    if (!partiel && q.length >= 4 && (k.includes(q) || q.includes(k))) partiel = t;
+    if (!partiel) { const mq = q.split(' ').filter(w => w.length > 2), mk = new Set(k.split(' ')); if (mq.length >= 2 && mq.filter(w => mk.has(w)).length / mq.length >= .6) partiel = t; }
+  }
+  if (meilleur) { const lg = Math.max(q.length, cle(meilleur).length); const seuil = lg <= 4 ? 0 : lg <= 9 ? 1 : Math.round(lg * .2); if (dMin <= seuil) return { type: 'proche', titre: meilleur }; }
+  if (partiel) return { type: 'partiel', titre: partiel };
+  return { type: 'aucun' };
+}
+function creerChacun() {
+  const J = { id: 'chacun', nom: 'Chacun son tour', icone: '🔁', pauseAuBuzz: false };
+  let racine, artiste = null, ordre = [], elimines = new Set(), courant = 0, cites = [], finChrono = 0, chronoPause = 0, chronoTimer = null, annulable = null;
+  let elTours, elEquipe, elBarre, elInput, elVerdict, elCites, elPause;
+  const C = () => CONFIG.chacun;
+  J.ouvrir = el => { racine = el; artiste ? afficherJeu() : afficherChoix(); };
+  J.quitter = () => { clearInterval(chronoTimer); chronoTimer = null; };
+  function afficherChoix() {
+    J.quitter(); artiste = null; racine.innerHTML = '';
+    racine.append(h('div', { class: 'entete-jeu' }, h('h2', {}, '🔁 Chacun son tour')),
+      h('p', { class: 'note' }, 'Choisissez l’artiste. Chaque équipe cite à tour de rôle un titre de cet artiste ; l’animateur tape le titre pour le vérifier.' + (C().elimination ? ' Une erreur, un doublon ou le temps écoulé = équipe éliminée.' : '')));
+    const arts = C().artistes || [];
+    if (!arts.length) { racine.append(vide()); return; }
+    racine.append(h('div', { class: 'artistes' }, arts.map(a => h('button', { class: 'artiste', onclick: () => demarrer(a) }, h('b', {}, a.nom), h('span', {}, (a.titres || []).length + ' titres dans la liste')))));
+  }
+  function demarrer(a) {
+    artiste = a; ordre = equipes.map(e => e.id); elimines = new Set(); courant = 0; cites = []; annulable = null;
+    afficherJeu(); relancerChrono();
+  }
+  function afficherJeu() {
+    racine.innerHTML = '';
+    elTours = h('div', { class: 'tours' }); elEquipe = h('div', { class: 'equipe-courante' });
+    elBarre = h('div', { class: 'barre-chrono', style: C().duree_tour > 0 ? '' : 'display:none' }, h('i', { style: 'width:100%' }));
+    elInput = h('input', { placeholder: 'Titre donné par l’équipe… puis Entrée', autocomplete: 'off', onkeydown: e => { if (e.key === 'Enter') { e.preventDefault(); verifier(); } } });
+    elVerdict = h('div', { class: 'verdict' }); elCites = h('div', { class: 'cites' });
+    elPause = h('button', { class: 'btn', onclick: basculerChrono }, '⏸ Chrono');
+    racine.append(
+      h('div', { class: 'entete-jeu' }, h('h2', {}, '🔁 ' + artiste.nom),
+        h('div', { class: 'pastilles' }, elPause,
+          h('button', { class: 'btn', onclick: () => suivant() }, '⏭ Passer'),
+          h('button', { class: 'btn', onclick: () => eliminer() }, '✗ Éliminer l’équipe'),
+          h('button', { class: 'btn', onclick: () => { if (confirm('Recommencer la manche ?')) demarrer(artiste); } }, '↺ Recommencer'),
+          h('button', { class: 'btn', onclick: afficherChoix }, 'Changer d’artiste'))),
+      elTours, elEquipe, elBarre,
+      h('div', { class: 'saisie' }, elInput, h('button', { class: 'btn plein gros', onclick: verifier }, 'Vérifier')),
+      elVerdict, h('h3', { class: 'note', style: 'text-align:center;margin:6px 0 0' }, 'Titres déjà cités'), elCites);
+    majTours(); majCites(); setTimeout(() => elInput.focus(), 50);
+  }
+  const actifs = () => ordre.filter(id => !elimines.has(id) && equipe(id));
+  const idCourant = () => ordre[courant];
+  function majTours() {
+    elTours.innerHTML = '';
+    ordre.forEach((id, i) => { const e = equipe(id); if (!e) return; elTours.append(h('span', { class: 'tour' + (i === courant ? ' courant' : '') + (elimines.has(id) ? ' elimine' : ''), style: '--c:' + e.couleur }, e.nom)); });
+    const e = equipe(idCourant());
+    if (e) { elEquipe.style.setProperty('--c', e.couleur); elEquipe.textContent = 'Au tour de ' + e.nom; }
+  }
+  function majCites() {
+    elCites.innerHTML = '';
+    if (!cites.length) elCites.append(h('span', { class: 'note' }, 'aucun pour l’instant'));
+    cites.slice().reverse().forEach(c => elCites.append(h('span', { class: 'cite', style: '--c:' + ((equipe(c.equipe) || {}).couleur || '#888') }, c.titre)));
+  }
+  function verdict(classe, texte, boutons = []) { elVerdict.className = 'verdict ' + classe; elVerdict.innerHTML = ''; elVerdict.append(h('div', {}, texte)); if (boutons.length) elVerdict.append(h('div', { class: 'commandes' }, boutons)); }
+  function verifier() {
+    const saisie = elInput.value.trim(); if (!saisie || !idCourant()) return;
+    const r = chercherTitre(saisie, artiste.titres || []);
+    const titre = r.titre || saisie;
+    const deja = cites.find(c => cle(c.titre) === cle(titre));
+    if (deja) {
+      pauseChrono(true); bipErreur();
+      verdict('ko', '🔁 « ' + deja.titre + ' » a déjà été cité !', [
+        h('button', { class: 'btn rouge', onclick: () => refuser() }, C().elimination ? '✗ Éliminer' : '✗ Refuser'),
+        h('button', { class: 'btn', onclick: () => { verdict('', ''); elInput.value = ''; elInput.focus(); pauseChrono(false); } }, 'Laisser réessayer')]);
+      return;
+    }
+    if (r.type === 'exact' || r.type === 'proche') return valider(r.titre);
+    pauseChrono(true);
+    if (r.type === 'partiel') {
+      verdict('info', 'Vouliez-vous dire « ' + r.titre + ' » ?', [
+        h('button', { class: 'btn vert', onclick: () => valider(r.titre) }, '✓ Oui, valider'),
+        h('button', { class: 'btn rouge', onclick: () => refuser() }, '✗ Non, refuser'),
+        h('button', { class: 'btn', onclick: () => valider(saisie) }, 'Valider « ' + saisie + ' »')]);
+    } else {
+      bipErreur();
+      verdict('ko', '✗ « ' + saisie + ' » n’est pas dans la liste de ' + artiste.nom, [
+        h('button', { class: 'btn', onclick: () => valider(saisie, true) }, '✓ Valider quand même'),
+        h('button', { class: 'btn rouge', onclick: () => refuser() }, C().elimination ? '✗ Refuser et éliminer' : '✗ Refuser')]);
+    }
+  }
+  function valider(titre, ajouterListe) {
+    const id = idCourant();
+    if (ajouterListe && !(artiste.titres || []).some(t => cle(t) === cle(titre))) { artiste.titres = (artiste.titres || []).concat(titre); ecrire('quiz-config', CONFIG); }
+    cites.push({ titre, equipe: id });
+    if (C().point_par_titre) ajouterPoints(id, 1);
+    annulable = { titre, equipe: id, courant };
+    sonner([880, 1320], .1, 'triangle', .2);
+    verdict('ok', '✓ « ' + titre + ' »', [h('button', { class: 'btn mini', onclick: annuler }, 'Annuler')]);
+    majCites(); suivant(true);
+  }
+  function annuler() {
+    if (!annulable) return;
+    cites = cites.filter(c => !(c.titre === annulable.titre && c.equipe === annulable.equipe));
+    if (C().point_par_titre) ajouterPoints(annulable.equipe, -1);
+    courant = annulable.courant; annulable = null;
+    verdict('', ''); majCites(); majTours(); relancerChrono();
+  }
+  function refuser() { if (C().elimination) eliminer(); else { verdict('ko', '✗ Refusé'); suivant(true); } }
+  function eliminer() {
+    const id = idCourant(); if (!id) return;
+    elimines.add(id); bipErreur(); annulable = null;
+    verdict('ko', '✗ Équipe ' + equipe(id).nom + ' éliminée');
+    if (actifs().length <= 1) return fin();
+    suivant(true);
+  }
+  function suivant(garderVerdict) {
+    if (!actifs().length) return;
+    if (!garderVerdict) verdict('', '');
+    let i = courant;
+    for (let k = 0; k < ordre.length; k++) { i = (i + 1) % ordre.length; if (!elimines.has(ordre[i]) && equipe(ordre[i])) break; }
+    courant = i; elInput.value = ''; majTours(); relancerChrono(); elInput.focus();
+  }
+  function fin() {
+    J.quitter(); majTours();
+    const g = equipe(actifs()[0]);
+    if (!g) return;
+    const f = $('#fin-manche'); f.style.setProperty('--c', g.couleur);
+    f.firstElementChild.innerHTML = '';
+    f.firstElementChild.append('🏆 Équipe ' + g.nom, h('small', {}, cites.length + ' titres de ' + artiste.nom + ' cités · cliquez pour fermer'));
+    f.classList.add('vu'); f.onclick = () => f.classList.remove('vu');
+    sonner([523, 659, 784, 1046], .2, 'triangle', .22);
+    elEquipe.textContent = '🏆 ' + g.nom + ' remporte la manche !';
+  }
+  function relancerChrono() {
+    clearInterval(chronoTimer); chronoTimer = null; chronoPause = 0; if (elPause) elPause.textContent = '⏸ Chrono';
+    const d = Number(C().duree_tour) || 0; if (d <= 0 || !elBarre) return;
+    finChrono = Date.now() + d * 1000;
+    chronoTimer = setInterval(() => {
+      const reste = finChrono - Date.now();
+      elBarre.firstChild.style.width = Math.max(0, reste / (d * 10)) + '%';
+      if (reste <= 0) { clearInterval(chronoTimer); chronoTimer = null; tempsEcoule(); }
+    }, 100);
+  }
+  function pauseChrono(oui) {
+    if (oui && chronoTimer) { chronoPause = finChrono - Date.now(); clearInterval(chronoTimer); chronoTimer = null; elPause.textContent = '▶ Chrono'; }
+    else if (!oui && chronoPause > 0) { const d = Number(C().duree_tour); const reste = chronoPause; relancerChrono(); finChrono = Date.now() + reste; elBarre.firstChild.style.width = (reste / (d * 10)) + '%'; }
+  }
+  function basculerChrono() { pauseChrono(!!chronoTimer); }
+  function tempsEcoule() {
+    sonner([300, 200], .3, 'sawtooth', .18);
+    verdict('ko', '⏰ Temps écoulé pour ' + (equipe(idCourant()) || {}).nom + ' !', C().elimination
+      ? [h('button', { class: 'btn rouge', onclick: eliminer }, '✗ Éliminer'), h('button', { class: 'btn', onclick: () => suivant() }, 'Passer sans éliminer'), h('button', { class: 'btn', onclick: () => { verdict('', ''); relancerChrono(); } }, 'Encore du temps')]
+      : [h('button', { class: 'btn', onclick: () => suivant() }, 'Équipe suivante')]);
+  }
+  return J;
+}
+
+// =====================================================================
+//  Navigation entre les jeux
+// =====================================================================
+const JEUX = [creerNuage(), creerParoles(), creerBlindTest(), creerKaraoke(), creerChacun()];
+function renduCategories() {
+  const box = $('#liste-cats'); box.innerHTML = '';
+  JEUX.forEach((j, i) => box.append(h('button', { class: 'cat' + (jeuCourant === j ? ' active' : ''), style: 'width:100%', onclick: () => choisirJeu(j.id) },
+    h('span', { class: 'ico' }, j.icone), h('span', {}, h('div', { class: 'num' }, 'Jeu ' + (i + 1)), h('div', { class: 'lib' }, j.nom)))));
+}
+function choisirJeu(id) {
+  if (jeuCourant && jeuCourant.quitter) jeuCourant.quitter();
+  Lecteur.stop();
+  jeuCourant = JEUX.find(j => j.id === id) || JEUX[0];
+  ecrire('quiz-jeu', jeuCourant.id);
+  $('#jeu').innerHTML = '';
+  jeuCourant.ouvrir($('#jeu'));
+  renduCategories();
+}
+
+// =====================================================================
+//  Fenêtre « Équipes »
+// =====================================================================
+const COULEURS = ['#ff3b5c', '#2f8cff', '#22d36b', '#ffd21f', '#b25cff', '#ff8a1f', '#1fe0d4', '#ff6fd8', '#ffffff', '#8bc34a'];
+let brouillonEquipes = [];
+function ouvrirEquipes() { brouillonEquipes = equipes.map(e => ({ ...e })); renduEquipesEd(); ouvrirModale('modale-equipes'); }
+function renduEquipesEd() {
+  const box = $('#liste-equipes-ed'); box.innerHTML = '';
+  brouillonEquipes.forEach((e, i) => box.append(h('div', { style: 'display:flex;gap:8px;align-items:center' },
+    h('input', { type: 'color', value: e.couleur, oninput: ev => e.couleur = ev.target.value, style: 'width:46px;height:40px;border:0;background:none' }),
+    h('div', { class: 'champ', style: 'flex:1' }, h('input', { value: e.nom, maxlength: 20, oninput: ev => e.nom = ev.target.value })),
+    h('span', { class: 'note' }, e.score + ' pts'),
+    h('button', { class: 'btn mini', disabled: i === 0, onclick: () => { [brouillonEquipes[i - 1], brouillonEquipes[i]] = [brouillonEquipes[i], brouillonEquipes[i - 1]]; renduEquipesEd(); } }, '↑'),
+    h('button', { class: 'btn mini', disabled: brouillonEquipes.length <= 2, onclick: () => { brouillonEquipes.splice(i, 1); renduEquipesEd(); } }, '🗑'))));
+}
+$('#btn-equipes').onclick = ouvrirEquipes;
+$('#btn-ajout-equipe').onclick = () => {
+  if (brouillonEquipes.length >= 10) return;
+  const c = COULEURS.find(c => !brouillonEquipes.some(e => e.couleur === c)) || '#888888';
+  brouillonEquipes.push({ id: 'eq' + Date.now().toString(36), nom: 'Équipe ' + (brouillonEquipes.length + 1), couleur: c, score: 0 }); renduEquipesEd();
+};
+$('#btn-zero').onclick = () => { if (confirm('Remettre tous les scores à zéro ?')) { brouillonEquipes.forEach(e => e.score = 0); renduEquipesEd(); } };
+$('#btn-valider-equipes').onclick = () => {
+  equipes = brouillonEquipes.map(e => ({ ...e, nom: e.nom.trim() || 'Équipe' }));
+  sauverEquipes(); rearmer(); renduScores(); fermerModale('modale-equipes');
+};
+
+// =====================================================================
+//  Fenêtre « Préparer les jeux »
+// =====================================================================
+const C_TITRE = { k: 'titre', l: 'Titre (la réponse)', t: 'texte', c: 'demi' }, C_ART = { k: 'artiste', l: 'Artiste', t: 'texte', c: 'demi' };
+const C_FICH = { k: 'fichier', l: 'Fichier audio', t: 'fichier', c: 'demi' }, C_DEB = { k: 'debut', l: 'Départ (s)', t: 'temps' };
+const SCHEMA = {
+  nuage: { nom: '☁️ Nuage de mots', note: 'Les mots apparaissent un par un. À la révélation, la chanson se lance.',
+    reglages: [{ k: 'intervalle', l: 'Secondes entre deux mots', t: 'nombre' }, { k: 'aleatoire', l: 'Mots dans un ordre aléatoire', t: 'case' }],
+    champs: [C_TITRE, C_ART, C_FICH, C_DEB, { k: 'mots', l: 'Mots du nuage (un par ligne, ou séparés par des virgules)', t: 'zone', c: 'large' }] },
+  paroles: { nom: '🎤 Terminer les paroles', note: 'La musique s’arrête toute seule au temps « Arrêt » ; vos paroles s’affichent avec des cases vides pour la suite.',
+    champs: [C_TITRE, C_ART, C_FICH, C_DEB, { k: 'arret', l: 'Arrêt de la musique (s)', t: 'temps' }, { k: 'avant', l: 'Paroles affichées juste avant l’arrêt', t: 'zone', c: 'demi' }, { k: 'reponse', l: 'Paroles à trouver', t: 'zone', c: 'demi' }] },
+  blindtest: { nom: '🎧 Blind test', note: 'Extrait joué à partir du temps de départ ; la pause se fait toute seule au premier buzz.', champs: [C_TITRE, C_ART, C_FICH, C_DEB] },
+  karaoke: { nom: '🥁 Karaoké – rythme', note: 'Le son se coupe (la chanson continue en silence) pendant la durée choisie, puis revient : les équipes doivent retomber pile dessus.',
+    champs: [C_TITRE, C_ART, C_FICH, C_DEB, { k: 'coupure', l: 'Coupure du son à (s)', t: 'temps' }, { k: 'duree', l: 'Durée de la coupure (s)', t: 'nombre' }, { k: 'aide', l: 'Paroles affichées pendant la coupure (facultatif)', t: 'zone', c: 'large' }] },
+  chacun: { nom: '🔁 Chacun son tour', note: 'Les titres servent à vérifier les réponses (accents, majuscules et petites fautes sont tolérés). Ajoutez ce qui manque, un titre par ligne.',
+    reglages: [{ k: 'duree_tour', l: 'Secondes par tour (0 = sans chrono)', t: 'nombre' }, { k: 'point_par_titre', l: '1 point par titre juste', t: 'case' }, { k: 'elimination', l: 'Élimination (erreur, doublon, temps)', t: 'case' }],
+    liste: 'artistes', champs: [{ k: 'nom', l: 'Artiste', t: 'texte', c: 'large' }, { k: 'titres', l: 'Titres (un par ligne)', t: 'lignes', c: 'large' }] }
+};
+let brouillon = null, ongletEd = 'nuage';
+const apercu = $('#audio-apercu');
+function ouvrirEditeur() { brouillon = JSON.parse(JSON.stringify(CONFIG)); if (jeuCourant) ongletEd = jeuCourant.id; renduEditeur(); ouvrirModale('editeur'); }
+$('#btn-preparer').onclick = ouvrirEditeur;
+function renduEditeur() {
+  if (!brouillon) return;
+  const ong = $('#ed-onglets'); ong.innerHTML = '';
+  Object.entries(SCHEMA).forEach(([id, s]) => ong.append(h('button', { class: 'cat' + (id === ongletEd ? ' active' : ''), onclick: () => { ongletEd = id; renduEditeur(); } }, h('span', { class: 'lib', style: 'font-size:15px' }, s.nom))));
+  const s = SCHEMA[ongletEd], d = brouillon[ongletEd], cleListe = s.liste || 'chansons';
+  d[cleListe] = d[cleListe] || [];
+  const box = $('#ed-contenu'); box.innerHTML = '';
+  box.append(h('p', { class: 'note', style: 'margin:0' }, s.note));
+  if (s.champs.some(c => c.t === 'fichier') && !Musique.fichiers.size)
+    box.append(h('div', { class: 'carte', style: 'padding:12px' }, '📁 Chargez d’abord votre dossier de musiques pour choisir les fichiers. ', h('button', { class: 'btn mini', onclick: () => Musique.choisir() }, 'Choisir le dossier')));
+  if (s.reglages) box.append(h('div', { class: 'ed-reglages' }, s.reglages.map(r => champ(r, d))));
+  d[cleListe].forEach((item, i) => {
+    const libelle = item.titre || item.nom || '(sans titre)';
+    box.append(h('div', { class: 'ed-item' },
+      h('div', { class: 'ed-item-tete' }, h('b', {}, (i + 1) + '. ' + libelle),
+        h('button', { class: 'btn mini', disabled: i === 0, onclick: () => { [d[cleListe][i - 1], d[cleListe][i]] = [d[cleListe][i], d[cleListe][i - 1]]; renduEditeur(); } }, '↑'),
+        h('button', { class: 'btn mini', disabled: i === d[cleListe].length - 1, onclick: () => { [d[cleListe][i + 1], d[cleListe][i]] = [d[cleListe][i], d[cleListe][i + 1]]; renduEditeur(); } }, '↓'),
+        h('button', { class: 'btn mini', onclick: () => { if (confirm('Supprimer « ' + libelle + ' » ?')) { d[cleListe].splice(i, 1); renduEditeur(); } } }, '🗑')),
+      s.champs.map(c => champ(c, item))));
+  });
+  box.append(h('button', { class: 'btn', style: 'align-self:flex-start', onclick: () => {
+    const n = {}; s.champs.forEach(c => n[c.k] = c.t === 'lignes' ? [] : (c.t === 'temps' || c.t === 'nombre') ? (c.k === 'duree' ? 8 : 0) : '');
+    d[cleListe].push(n); renduEditeur(); box.scrollTop = box.scrollHeight;
+  } }, ongletEd === 'chacun' ? '+ Ajouter un artiste' : '+ Ajouter une chanson'));
+}
+function champ(c, obj) {
+  const lab = h('label', { class: 'champ ' + (c.c || '') }, c.l);
+  if (c.t === 'case') return h('label', { class: 'case' }, h('input', { type: 'checkbox', checked: !!obj[c.k], onchange: e => obj[c.k] = e.target.checked }), c.l);
+  if (c.t === 'zone') lab.append(h('textarea', { value: obj[c.k] || '', oninput: e => obj[c.k] = e.target.value }));
+  else if (c.t === 'lignes') lab.append(h('textarea', { style: 'min-height:120px', value: (obj[c.k] || []).join('\n'), oninput: e => obj[c.k] = e.target.value.split('\n').map(s => s.trim()).filter(Boolean) }));
+  else if (c.t === 'nombre') lab.append(h('input', { type: 'number', min: 0, step: 1, value: obj[c.k] ?? '', oninput: e => obj[c.k] = Number(e.target.value) }));
+  else if (c.t === 'temps') {
+    const inp = h('input', { type: 'number', min: 0, step: .1, value: obj[c.k] ?? 0, oninput: e => obj[c.k] = Number(e.target.value) });
+    lab.append(h('div', { class: 'avec-bouton' }, inp, h('button', { class: 'btn mini', type: 'button', title: 'Prendre le temps de l’écoute en cours', onclick: e => {
+      e.preventDefault(); if (!apercu.src) return toast('Lancez d’abord l’écoute (▶ à côté du fichier).');
+      obj[c.k] = Math.round(apercu.currentTime * 10) / 10; inp.value = obj[c.k];
+    } }, '⏱')));
+  } else if (c.t === 'fichier') {
+    const liste = Musique.liste(); const val = obj[c.k] || '';
+    const sel = h('select', { onchange: e => obj[c.k] = e.target.value },
+      h('option', { value: '' }, '— aucun —'),
+      val && !Musique.trouver(val) ? h('option', { value: val, selected: true }, '⚠ ' + val + ' (introuvable)') : null,
+      liste.map(f => h('option', { value: f, selected: Musique.trouver(val) === f }, f)));
+    lab.append(h('div', { class: 'avec-bouton' }, sel, h('button', { class: 'btn mini', type: 'button', title: 'Écouter', onclick: e => {
+      e.preventDefault(); const u = Musique.url(obj[c.k]); if (!u) return toast('Choisissez un fichier.');
+      if (apercu.dataset.f !== obj[c.k]) { apercu.src = u; apercu.dataset.f = obj[c.k]; apercu.currentTime = Number(obj.debut) || 0; }
+      $('#ap-nom').textContent = 'Écoute : ' + obj[c.k]; apercu.play();
+    } }, '▶')));
+  } else lab.append(h('input', { value: obj[c.k] || '', oninput: e => obj[c.k] = e.target.value }));
+  return lab;
+}
+$('#ap-lecture').onclick = () => { if (!apercu.src) return; apercu.paused ? apercu.play() : apercu.pause(); };
+apercu.ontimeupdate = () => { $('#ap-temps').textContent = fmt(apercu.currentTime) + ' / ' + fmt(apercu.duration); if (apercu.duration) $('#ap-prog').value = apercu.currentTime / apercu.duration * 1000; };
+apercu.onplay = apercu.onpause = () => { $('#ap-lecture').textContent = apercu.paused ? '▶' : '⏸'; };
+$('#ap-prog').oninput = e => { if (apercu.duration) apercu.currentTime = e.target.value / 1000 * apercu.duration; };
+$('#ed-dossier').onclick = () => Musique.choisir();
+$('#ed-enregistrer').onclick = () => {
+  CONFIG = brouillon; ecrire('quiz-config', CONFIG); fermerModale('editeur');
+  if (jeuCourant) { const id = jeuCourant.id; jeuCourant = null; choisirJeu(id); }
+  toast('Préparation enregistrée ✓ (pensez à ⬇ Exporter pour garder une copie)');
+};
+$('#ed-export').onclick = () => {
+  const blob = new Blob([JSON.stringify(brouillon, null, 2)], { type: 'application/json' });
+  const a = h('a', { href: URL.createObjectURL(blob), download: 'quiz-musical-preparation.json' }); document.body.append(a); a.click(); a.remove();
+};
+$('#ed-import').onclick = () => $('#input-import').click();
+$('#input-import').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const d = JSON.parse(await f.text()); for (const k of Object.keys(CONFIG_DEFAUT)) if (!d[k]) d[k] = JSON.parse(JSON.stringify(CONFIG_DEFAUT[k])); brouillon = d; renduEditeur(); toast('Préparation importée : cliquez sur Enregistrer pour l’utiliser.'); }
+  catch (_) { toast('Ce fichier n’est pas une préparation valide.'); }
+};
+
+// =====================================================================
+//  Boutons et clavier
+// =====================================================================
+$('#btn-rearmer').onclick = rearmer;
+$('#etat-buzz').onclick = () => { buzz.ouvert = !buzz.ouvert; majBuzz(); };
+$('#btn-bonne').onclick = bonneReponse;
+$('#btn-mauvaise').onclick = mauvaiseReponse;
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea, select') || document.querySelector('.modale.ouverte') || e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (e.code === 'Space') { e.preventDefault(); basculerLecture(); }
+  else if (k === 'r') rearmer();
+  else if (k === 'b') { buzz.ouvert = !buzz.ouvert; majBuzz(); }
+  else if (k === 'v') bonneReponse();
+  else if (k === 'x') mauvaiseReponse();
+  else if (e.key === 'ArrowRight' && jeuCourant && jeuCourant.nav) jeuCourant.nav(1);
+  else if (e.key === 'ArrowLeft' && jeuCourant && jeuCourant.nav) jeuCourant.nav(-1);
+  else if (/^Digit[1-9]$/.test(e.code)) { const eq = equipes[Number(e.code.slice(5)) - 1]; if (eq) ajouterPoints(eq.id, e.shiftKey ? -1 : 1); }
+});
+
+// =====================================================================
+//  Démarrage
+// =====================================================================
+renduScores(); majBuzz(); majMusique(); dessinerQR(); requestAnimationFrame(boucle);
+choisirJeu(lire('quiz-jeu', 'nuage'));
+Musique.restaurer();
+demarrerPeer();
+window.__quiz = { recevoirBuzz, Musique, equipes: () => equipes, buzz, chercherTitre };
+</script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0a1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Buzzer — Quiz musical</title>
+<style>
+  :root { --c: #8b8bb0; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #0b0a1c; color: #fff; overscroll-behavior: none;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-user-select: none; user-select: none; }
+  .ecran { display: none; min-height: 100%; flex-direction: column; }
+  .ecran.actif { display: flex; }
+
+  /* Choix de l'équipe */
+  #choix { padding: 28px 20px; gap: 14px; }
+  #choix h1 { margin: 0 0 4px; font-size: 28px; }
+  #choix p { margin: 0 0 10px; color: #b9b7d8; }
+  #choix input { width: 100%; font-size: 18px; padding: 14px 16px; border-radius: 14px; border: 2px solid #2b2950;
+    background: #15142d; color: #fff; margin-bottom: 8px; -webkit-user-select: text; user-select: text; }
+  .equipes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .equipe-btn { border: 0; border-radius: 18px; padding: 26px 10px; font-size: 21px; font-weight: 800; color: #111;
+    background: var(--c); box-shadow: 0 6px 0 rgba(0,0,0,.35), 0 0 30px color-mix(in srgb, var(--c) 40%, transparent); }
+  .equipe-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,.35); }
+
+  /* Buzzer */
+  #jeu { background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c) 28%, #0b0a1c) 0%, #0b0a1c 70%); }
+  #jeu header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; padding-top: max(14px, env(safe-area-inset-top)); }
+  #nom-equipe { font-weight: 900; font-size: 22px; color: var(--c); text-shadow: 0 0 18px color-mix(in srgb, var(--c) 60%, transparent); }
+  #changer { background: transparent; color: #b9b7d8; border: 1px solid #3a3866; border-radius: 999px; padding: 8px 14px; font-size: 14px; }
+  .zone { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; }
+  #bouton { width: min(82vw, 62vh); aspect-ratio: 1; border-radius: 50%; border: 0; position: relative;
+    background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 55%, #fff) 0%, var(--c) 45%, color-mix(in srgb, var(--c) 70%, #000) 100%);
+    box-shadow: 0 14px 0 color-mix(in srgb, var(--c) 45%, #000), 0 0 60px color-mix(in srgb, var(--c) 60%, transparent);
+    color: #fff; font-size: clamp(34px, 11vw, 64px); font-weight: 900; letter-spacing: 2px; text-shadow: 0 3px 10px rgba(0,0,0,.45);
+    transition: transform .06s, filter .2s; touch-action: manipulation; }
+  #bouton.pret { animation: respire 1.6s ease-in-out infinite; }
+  #bouton:active, #bouton.appuye { transform: translateY(10px); box-shadow: 0 4px 0 color-mix(in srgb, var(--c) 45%, #000), 0 0 90px var(--c); }
+  #bouton.inactif { filter: grayscale(.85) brightness(.55); animation: none; }
+  #bouton.premier { animation: gagne .5s ease-in-out infinite alternate; }
+  #bouton small { display: block; font-size: .32em; letter-spacing: 0; font-weight: 700; margin-top: 6px; }
+  @keyframes respire { 50% { box-shadow: 0 14px 0 color-mix(in srgb, var(--c) 45%, #000), 0 0 110px var(--c); } }
+  @keyframes gagne { from { filter: brightness(1); } to { filter: brightness(1.35); box-shadow: 0 14px 0 color-mix(in srgb, var(--c) 45%, #000), 0 0 140px #fff; } }
+  #message { text-align: center; font-size: 20px; font-weight: 700; min-height: 60px; padding: 0 20px 10px; color: #e7e6ff; }
+  #connexion { text-align: center; font-size: 13px; color: #8d8bb5; padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+  #connexion.ko { color: #ff7b8f; }
+</style>
+</head>
+<body>
+
+<section id="choix" class="ecran">
+  <h1>🎵 Quiz musical</h1>
+  <p>Votre prénom (facultatif), puis touchez la couleur de votre équipe.</p>
+  <input id="joueur" maxlength="20" placeholder="Prénom" autocomplete="off">
+  <div class="equipes" id="equipes"></div>
+  <p id="attente" style="text-align:center">Connexion au jeu…</p>
+</section>
+
+<section id="jeu" class="ecran">
+  <header><span id="nom-equipe"></span><button id="changer">Changer d'équipe</button></header>
+  <div class="zone"><button id="bouton">BUZZ</button></div>
+  <div id="message"></div>
+  <div id="connexion">Connexion…</div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const SALLE = (new URLSearchParams(location.search).get('salle') || '').trim().toUpperCase();
+let etat = null, peer = null, conn = null, envoi = false, relance = null;
+let moi = null;
+try { moi = JSON.parse(localStorage.getItem('quiz-buzzer-' + SALLE) || 'null'); } catch (_) {}
+$('#joueur').value = (moi && moi.joueur) || localStorage.getItem('quiz-prenom') || '';
+
+function statut(txt, ok) { $('#connexion').textContent = txt; $('#connexion').className = ok ? '' : 'ko'; if (!etat) $('#attente').textContent = txt; }
+
+function envoyer(msg) { if (conn && conn.open) { conn.send(msg); return true; } return false; }
+function annoncer() { envoyer({ type: 'hello', equipe: (moi && moi.equipe) || '', joueur: (moi && moi.joueur) || '' }); }
+
+function connecter() {
+  if (!SALLE) { statut("Lien incomplet : scannez le QR code affiché par l'animateur.", false); return; }
+  if (typeof Peer === 'undefined') { statut('Pas de connexion Internet…', false); return; }
+  if (!peer || peer.destroyed) {
+    peer = new Peer({ debug: 0 });
+    peer.on('open', ouvrirConnexion);
+    peer.on('disconnected', () => { try { peer.reconnect(); } catch (_) {} });
+    peer.on('error', err => {
+      statut(err.type === 'peer-unavailable' ? "Le jeu de l'animateur n'est pas ouvert… nouvel essai" : 'Connexion difficile… nouvel essai', false);
+      planifier();
+    });
+  } else if (peer.open) ouvrirConnexion();
+}
+function ouvrirConnexion() {
+  if (conn && conn.open) return;
+  statut('Connexion au jeu…', false);
+  conn = peer.connect('quizmusical-' + SALLE, { reliable: true });
+  conn.on('open', () => { statut('Connecté ✓', true); annoncer(); });
+  conn.on('data', d => { if (d && d.type === 'etat') { etat = d.etat; rendu(); } });
+  conn.on('close', () => { statut('Connexion perdue… reconnexion', false); planifier(); });
+  conn.on('error', () => planifier());
+}
+function planifier() { clearTimeout(relance); relance = setTimeout(() => { conn = null; connecter(); }, 2500); }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !(conn && conn.open)) { conn = null; connecter(); } });
+
+function montrer(id) { document.querySelectorAll('.ecran').forEach(e => e.classList.toggle('actif', e.id === id)); }
+
+function rendu() {
+  if (!etat) return;
+  const equipe = moi && etat.equipes.find(e => e.id === moi.equipe);
+  if (!equipe) {
+    montrer('choix');
+    $('#attente').style.display = 'none';
+    const box = $('#equipes'); box.innerHTML = '';
+    etat.equipes.forEach(e => {
+      const b = document.createElement('button');
+      b.className = 'equipe-btn'; b.textContent = e.nom; b.style.setProperty('--c', e.couleur);
+      b.onclick = () => {
+        moi = { equipe: e.id, joueur: $('#joueur').value.trim() };
+        localStorage.setItem('quiz-buzzer-' + SALLE, JSON.stringify(moi));
+        localStorage.setItem('quiz-prenom', moi.joueur);
+        annoncer(); rendu(); verrouEcran();
+      };
+      box.appendChild(b);
+    });
+    return;
+  }
+  montrer('jeu');
+  document.documentElement.style.setProperty('--c', equipe.couleur);
+  document.querySelector('meta[name=theme-color]').content = equipe.couleur;
+  $('#nom-equipe').textContent = 'Équipe ' + equipe.nom + (moi.joueur ? ' · ' + moi.joueur : '');
+
+  const b = etat.buzz, bouton = $('#bouton'), msg = $('#message');
+  const rang = b.ordre.findIndex(x => x.equipe === moi.equipe);
+  const etaitPremier = bouton.classList.contains('premier');
+  bouton.className = '';
+  bouton.dataset.premier = etaitPremier ? '1' : '';
+  if (rang === 0) {
+    if (!bouton.dataset.premier && navigator.vibrate) navigator.vibrate([120, 60, 120]);
+    bouton.classList.add('premier');
+    const qui = b.ordre[0].joueur;
+    bouton.innerHTML = '1<sup>er</sup> !';
+    msg.textContent = qui && qui !== moi.joueur ? `${qui} a buzzé pour votre équipe : à vous de répondre !` : 'Vous avez la main : répondez !';
+  } else if (rang > 0) {
+    bouton.classList.add('inactif');
+    bouton.innerHTML = (rang + 1) + '<sup>e</sup>';
+    msg.textContent = "Une autre équipe a été plus rapide… restez prêts !";
+  } else if (b.exclues.includes(moi.equipe)) {
+    bouton.classList.add('inactif');
+    bouton.innerHTML = '✗<small>hors jeu</small>';
+    msg.textContent = 'Mauvaise réponse : vous ne pouvez plus buzzer sur cette question.';
+  } else if (!b.ouvert) {
+    bouton.classList.add('inactif');
+    bouton.innerHTML = '⏸<small>en attente</small>';
+    msg.textContent = "Les buzzers sont fermés pour l'instant.";
+  } else if (b.ordre.length) {
+    bouton.classList.add('pret');
+    bouton.textContent = 'BUZZ';
+    const premier = etat.equipes.find(e => e.id === b.ordre[0].equipe);
+    msg.textContent = premier ? `L'équipe ${premier.nom} a la main… buzzez si vous savez !` : '';
+  } else {
+    bouton.classList.add('pret');
+    bouton.textContent = 'BUZZ';
+    msg.textContent = '';
+  }
+}
+
+async function appuyer(ev) {
+  ev.preventDefault();
+  if (!etat || !moi || envoi) return;
+  const b = etat.buzz;
+  if (!b.ouvert || b.exclues.includes(moi.equipe) || b.ordre.some(x => x.equipe === moi.equipe)) return;
+  const bouton = $('#bouton');
+  bouton.classList.add('appuye');
+  if (navigator.vibrate) navigator.vibrate(80);
+  if (!envoyer({ type: 'buzz', equipe: moi.equipe, joueur: moi.joueur })) $('#message').textContent = "Le buzz n'est pas passé : connexion perdue.";
+  envoi = true;
+  setTimeout(() => { bouton.classList.remove('appuye'); envoi = false; }, 300);
+}
+$('#bouton').addEventListener('pointerdown', appuyer);
+$('#changer').onclick = () => { moi = null; localStorage.removeItem('quiz-buzzer-' + SALLE); annoncer(); rendu(); };
+
+let verrou = null;
+async function verrouEcran() {
+  try { if ('wakeLock' in navigator && !verrou) { verrou = await navigator.wakeLock.request('screen'); verrou.addEventListener('release', () => verrou = null); } } catch (_) {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verrouEcran(); });
+document.addEventListener('pointerdown', verrouEcran, { once: true });
+
+montrer('choix');
+connecter();
+</script>
+</body>
+</html>
