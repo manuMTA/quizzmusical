@@ -224,6 +224,8 @@ body.jeu-paroles #chrono-paroles.actif { display: block; }
 .paroles-vue { height: calc(10 * 30px * 1.4); overflow: hidden; font-family: var(--titre); font-weight: 400; text-align: center; flex-shrink: 0; }
 .paroles-defile { will-change: transform; }
 .paroles-defile > div { font-size: 30px; line-height: 1.4; color: #f2f1ff; }
+.paroles-defile > div.ligne-trous { min-height: calc(2 * 30px * 1.4); display: flex; align-items: center; justify-content: center; }
+.ligne-trous .trous { margin-top: 0; }
 .paroles-defile > div.actuelle, .ligne-actuelle { font-weight: 800; color: #ff9a1f; }
 #logo { cursor: pointer; }
 #accueil { position: fixed; inset: 0; z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 34px; padding: 30px;
@@ -971,6 +973,8 @@ function creerParoles() {
       // toutes les lignes dans une « fenêtre » : le texte glisse vers le haut, sans changer de taille
       const vue = h('div', { class: 'paroles-vue' }), contenu = h('div', { class: 'paroles-defile' });
       lignes.forEach(l => contenu.append(h('div', {}, l || '\u00a0')));
+      // à l'arrêt : les cases des mots à trouver arrivent juste après les paroles, sur les lignes 8-9 de l'écran
+      if (phase === 'stop' || phase === 'revele') contenu.append(h('div', { class: 'ligne-trous' }, trous(c.reponse, phase === 'revele')));
       vue.append(contenu); zoneTexte.append(vue);
       const haut = i => (contenu.children[Math.min(i, contenu.children.length - 1)] || { offsetTop: 0 }).offsetTop;
       contenu.style.transition = 'none'; contenu.style.transform = 'translateY(' + (-haut(offPrec)) + 'px)';
@@ -978,7 +982,6 @@ function creerParoles() {
       contenu.style.transition = 'transform .7s cubic-bezier(.33, 0, .2, 1)'; contenu.style.transform = 'translateY(' + (-haut(off)) + 'px)';
       offPrec = off;
     }
-    if (phase === 'stop' || phase === 'revele') zoneTexte.append(trous(c.reponse, phase === 'revele'));
     if (phase === 'pret') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: lancer }, '▶ Lancer la chanson'), h('span', { class: 'note' }, 'au même moment que la musique'));
     if (phase === 'lecture') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: stopper }, Lecteur.virt ? '⏹ Stop : à vous de chanter' : '⏹ Arrêter ici'));
     if (phase === 'stop') zoneCmd.append(h('button', { class: 'btn plein gros', onclick: reveler }, '👀 Révéler les paroles'));
@@ -993,7 +996,7 @@ function creerParoles() {
     if (Number(c.arret) > 0) Lecteur.quand(c.arret, stopper);
     rendu();
   }
-  function stopper() { Lecteur.pause(); Lecteur.veilles = []; phase = 'stop'; rendu(); sonner([660, 880], .12, 'triangle', .2); }
+  function stopper() { Lecteur.pause(); Lecteur.veilles = []; phase = 'stop'; off = Math.max(0, lignesVues().lignes.length - 7); rendu(); sonner([660, 880], .12, 'triangle', .2); }
   function reveler() { if (phase === 'lecture') stopper(); phase = 'revele'; faits.add(idx); rendu(); }
   // toutes les lignes déjà affichées + début de la page en cours
   function lignesVues() {
@@ -1344,7 +1347,7 @@ function creerChacun() {
 // =====================================================================
 //  Navigation entre les jeux
 // =====================================================================
-const JEUX = [creerNuage(), creerKaraoke(), creerBlindTest(), creerParoles(), creerChacun()];   // jeu 2 = karaoké, jeu 4 = terminer les paroles
+const JEUX = [creerNuage(), creerParoles(), creerBlindTest(), creerKaraoke(), creerChacun()];   // jeu 2 = terminer les paroles, jeu 4 = karaoké
 function renduCategories() {
   const box = $('#liste-cats'); box.innerHTML = '';
   JEUX.forEach((j, i) => box.append(h('button', { class: 'cat' + (jeuCourant === j ? ' active' : ''), style: 'width:100%', onclick: () => choisirJeu(j.id) },

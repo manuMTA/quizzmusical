@@ -31,9 +31,9 @@ La préparation, les équipes et les scores sont gardés dans le navigateur de c
 
 ## 4. Les jeux
 1. **Nuage de mots** : les mots que vous avez saisis apparaissent un par un ; « Révéler » affiche le titre et lance la chanson.
-2. **Karaoké – garde le rythme** : le son se coupe pendant X secondes (la chanson continue en silence), puis revient : on voit qui est resté dans le rythme.
+2. **Terminer les paroles** : la musique s'arrête toute seule au temps choisi, vos paroles s'affichent avec des cases vides, puis « Révéler » les remplit.
 3. **Blind test** : extrait à partir du temps de départ, pause automatique au buzz.
-4. **Terminer les paroles** : la musique s'arrête toute seule au temps choisi, vos paroles s'affichent avec des cases vides, puis « Révéler » les remplit.
+4. **Karaoké – garde le rythme** : le son se coupe pendant X secondes (la chanson continue en silence), puis revient : on voit qui est resté dans le rythme.
 5. **Chacun son tour** : choisissez l'artiste ; chaque équipe cite un titre à son tour, vous le tapez et l'appli vérifie (accents, majuscules et petites fautes tolérés, doublons détectés). Chrono par tour, élimination et point par titre se règlent dans ✏️ Préparer. Les listes de Cabrel (80 titres), Gims (134), Vianney (50), Stromae (51) et Johnny (167) sont pré-remplies, duos et featurings compris (le partenaire s'affiche entre parenthèses, il n'a pas à être cité) ; si une préparation était déjà enregistrée, les titres manquants y sont ajoutés automatiquement. « Valider quand même » ajoute un titre manquant à la liste.
 
 Les paroles ne sont pas fournies : c'est vous qui les saisissez dans ✏️ Préparer.
@@ -61,7 +61,26 @@ JEU 1 — NUAGE DE MOTS
 14. Balance ton quoi — Angèle
     Total : 14 chansons
 
-JEU 2 — KARAOKÉ « GARDE LE RYTHME »
+JEU 2 — TERMINER LES PAROLES
+(les équipes choisissent leur chanson)
+------------------------------------------------------------
+ 1. Melodrama — Disiz et Theodora
+ 2. Clic clic pan pan — Yanns
+ 3. Et bam — Mentissa
+ 4. Tahiti — Keen'V
+ 5. Beau-papa — Vianney
+ 6. Je t'emmène au vent — Louise Attaque
+ 7. Tu m'oublieras — Larusso
+ 8. Je danse le Mia — IAM
+ 9. Tomber la chemise — Zebda
+    Total : 9 chansons
+
+JEU 3 — BLIND TEST
+(liste à compléter dans ✏️ Préparer)
+------------------------------------------------------------
+
+
+JEU 4 — KARAOKÉ « GARDE LE RYTHME »
 (les équipes choisissent leur chanson)
 ------------------------------------------------------------
  1. Les Lacs du Connemara — Michel Sardou
@@ -78,25 +97,6 @@ JEU 2 — KARAOKÉ « GARDE LE RYTHME »
 12. Coco — Wejdene
 13. Beau-papa — Vianney
     Total : 13 chansons
-
-JEU 3 — BLIND TEST
-(liste à compléter dans ✏️ Préparer)
-------------------------------------------------------------
-
-
-JEU 4 — TERMINER LES PAROLES
-(les équipes choisissent leur chanson)
-------------------------------------------------------------
- 1. Melodrama — Disiz et Theodora
- 2. Clic clic pan pan — Yanns
- 3. Et bam — Mentissa
- 4. Tahiti — Keen'V
- 5. Beau-papa — Vianney
- 6. Je t'emmène au vent — Louise Attaque
- 7. Tu m'oublieras — Larusso
- 8. Je danse le Mia — IAM
- 9. Tomber la chemise — Zebda
-    Total : 9 chansons
 
 JEU 5 — CHACUN SON TOUR
 (choisir un artiste ; titres acceptés vérifiés par l'application)
