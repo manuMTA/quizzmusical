@@ -2,15 +2,4 @@
 # Utilisé dans : Jeu 1 – Nuage de mots (n° 1)
 # Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
 # Nuage de mots : jusqu'à 20 mots sont choisis automatiquement, sans les mots du titre ni de l'artiste.
-téléphone
-machine
-Kelton
-Joséphine 
-Dolly Parton
-Olivia 
-Club À Gogo
-danser 
-poulet 
-Lennon
-fanfare 
-stroboscopes
+
