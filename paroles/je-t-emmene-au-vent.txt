@@ -1,7 +1,56 @@
 # Je t'emmène au vent — Louise Attaque
-# Utilisé dans : Jeu 4 – Terminer les paroles (n° 6)
+# Utilisé dans : Jeu 2 – Terminer les paroles (n° 6)
 # Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
 # Ligne vide = nouveau paragraphe.
 # Terminer les paroles : mettez [STOP] (ou [STOP 1:23] avec le temps) seul sur une ligne là où la musique s'arrête ;
 #   le paragraphe juste après [STOP] = les paroles à trouver. Facultatif : [1:05] en début de paragraphe = affichage à ce moment.
-
+Allez viens, j't'emmène au vent
+Je t'emmène au dessus des gens
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu m'appelles plus souvent
+Que tu prennes parfois le devant
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu sois celle que j'entends
+Allez viens j't'emmène au dessus des gens
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Et pas artificiel
+Je voudrais que tu te ramènes devant
+Que tu sois là de temps en temps
+Et je voudrais que tu te rappelles
+Notre amour est éternel
+Artificiel

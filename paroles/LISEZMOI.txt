@@ -6,8 +6,6 @@ Ouvrez le fichier, collez les paroles sous les lignes qui commencent par #, enre
 puis déposez le dossier « paroles » sur GitHub, à côté de index.html.
 
 Règles :
-- Nuage de mots (jeu 1) : jusqu'à 20 mots sont tirés automatiquement des paroles,
-  sans les mots du titre, de l'artiste ni les petits mots (le, de, je...).
 - Ligne vide = nouveau paragraphe.
 - [STOP] ou [STOP 1:23] seul sur une ligne = arrêt de la musique (jeu « Terminer les paroles ») ;
   le paragraphe qui suit = paroles à trouver.
