@@ -778,17 +778,22 @@ const blocReponse = c => h('div', { class: 'reponse apparait' }, h('div', { clas
 // Les mots rares apparaissent d'abord (plus difficile), les plus fréquents (refrain) à la fin et en plus gros.
 const MOTS_VIDES = new Set(('le la les l de des du d un une et a au aux en dans sur sous par pour avec sans je j tu il elle on nous vous ils elles me m te t se s ' +
   'ma ta sa mon ton son mes tes ses nos vos leur leurs ce c cet cette ces ca qui que qu quoi dont ou ne n pas plus moins y est es suis sont ai as avons avez ont ' +
-  'etait etre avoir fait mais donc or ni car si comme tout tous toute toutes moi toi lui eux oui non oh ah eh hey yeah yeah la na lalala ouh baby').split(' '));
+  'etait etre avoir fait mais donc or ni car si comme tout tous toute toutes moi toi lui eux oui non oh ah eh hey yeah yeah la na lalala ouh baby ' +
+  'faire faut fais dit dis dire veux veut voulez peux peut pouvoir sais sait savoir vais va vas aller allez vont viens vient venir vois voit voir ' +
+  'quand alors encore toujours jamais rien bien tres trop aussi meme memes autre autres celui celle ceux cela ceci comment pourquoi parce puis ' +
+  'avais avait etais etait sera serai seras serait aurai aura aurait suis sommes etes fut ete eu deja ici voila juste vraiment peu beaucoup ' +
+  'chaque quelque quelques personne chose choses fois jour jours tant donne donner prends prend mets met dans vers chez entre apres avant depuis ' +
+  'leurs notre votre nous vous elle elles ils lui eux mien tien sien hein ouais okay yeah ohoh wouh ooh lala').split(' '));
 function choisirMotsNuage(texte, c, max) {
   const n = x => String(x || '').toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[̀-ͯ]/g, '');
   const interdits = new Set(n(c.titre + ' ' + c.artiste).split(/[^a-z0-9]+/).filter(Boolean));
   const vus = new Map();
   for (const brut of String(texte).replace(/\[[^\]]*\]/g, ' ').split(/[^\p{L}\p{N}]+/u)) {
     const k = n(brut);
-    if (k.length < 3 || MOTS_VIDES.has(k) || interdits.has(k) || /^\d+$/.test(k)) continue;
+    if (k.length < 4 || MOTS_VIDES.has(k) || interdits.has(k) || /^\d+$/.test(k)) continue;
     const e = vus.get(k); if (e) e.f++; else vus.set(k, { mot: brut.toLowerCase(), f: 1 });
   }
-  let liste = melanger([...vus.values()]).sort((a, b) => b.f - a.f).slice(0, max);  // les plus marquants
+  let liste = melanger([...vus.values()]).sort((a, b) => (b.f + Math.min(b.mot.length, 9) / 6) - (a.f + Math.min(a.mot.length, 9) / 6)).slice(0, max);  // les plus marquants (répétés et longs)
   liste = melanger(liste).sort((a, b) => a.f - b.f);                                  // rares d'abord
   const fmax = Math.max(1, ...liste.map(x => x.f));
   return liste.map(x => ({ mot: x.mot, poids: x.f / fmax }));
@@ -1601,7 +1606,7 @@ $('#btn-valider-equipes').onclick = () => {
 const C_TITRE = { k: 'titre', l: 'Titre (la réponse)', t: 'texte', c: 'demi' }, C_ART = { k: 'artiste', l: 'Artiste', t: 'texte', c: 'demi' };
 const C_FICH = { k: 'fichier', l: 'Fichier audio', t: 'fichier', c: 'demi' }, C_DEB = { k: 'debut', l: 'Départ (s)', t: 'temps' };
 const SCHEMA = {
-  nuage: { nom: '☁️ Jeu 1 – Nuage de mots', note: 'Les mots du nuage sont ceux de la liste « Mots du nuage » de chaque chanson (un par ligne, 20 maximum par défaut), dans l’ordre saisi. Une fois le nuage terminé, les paroles de la chanson (fichier du dossier « paroles ») s’affichent.',
+  nuage: { nom: '☁️ Jeu 1 – Nuage de mots', note: 'Les mots du nuage sont ceux de la liste « Mots du nuage » de chaque chanson (un par ligne, 20 maximum par défaut), dans l’ordre saisi. Le bouton ✨ remplit cette liste avec les mots significatifs des paroles (sans les petits mots, ni le titre, ni l’artiste) ; vous pouvez ensuite la retoucher. Une fois le nuage terminé, les paroles de la chanson (fichier du dossier « paroles ») s’affichent.',
     reglages: [{ k: 'intervalle', l: 'Secondes entre deux mots', t: 'nombre' }, { k: 'max_mots', l: 'Nombre de mots maximum', t: 'nombre' }, { k: 'aleatoire', l: 'Mots dans un ordre aléatoire', t: 'case' }, { k: 'depuis_paroles', l: 'Prendre plutôt les mots dans les paroles', t: 'case' }, { k: 'chansons_aleatoires', l: 'Chansons dans un ordre aléatoire', t: 'case' }],
     champs: [C_TITRE, C_ART, C_FICH, C_DEB, { k: 'mots', l: 'Mots du nuage (un par ligne, ou séparés par des virgules)', t: 'zone', c: 'large' }] },
   devine: { nom: '🎯 Jeu 2 – Devine la chanson', note: 'Une seule équipe joue. L’animateur fait défiler les chansons une par une : flèche → (ou ✓ OK) = 1 point de manche et chanson suivante, flèche ↓ (ou ✗ Passer) = chanson suivante sans point. Les points de manche peuvent être ajoutés au score général avec « ➕ Au score général ».', sansListe: true,
@@ -1629,6 +1634,11 @@ function renduEditeur() {
   if (s.champs.some(c => c.t === 'fichier') && !Musique.fichiers.size)
     box.append(h('div', { class: 'carte', style: 'padding:12px' }, '📁 Chargez d’abord votre dossier de musiques pour choisir les fichiers. ', h('button', { class: 'btn mini', onclick: () => Musique.choisir() }, 'Choisir le dossier')));
   if (s.reglages) box.append(h('div', { class: 'ed-reglages', style: s.sansListe ? 'flex-direction:column;align-items:stretch' : '' }, s.reglages.map(r => champ(r, d))));
+  if (ongletEd === 'nuage') box.append(h('div', {}, h('button', { class: 'btn', onclick: async () => {
+    let n = 0; for (const it of d.chansons || []) if (await remplirMotsNuage(it, false)) n++;
+    toast(n ? n + ' liste(s) remplie(s) avec les mots des paroles. Relisez-les, puis Enregistrer.' : 'Aucun fichier de paroles trouvé : déposez d’abord le dossier « paroles » sur le serveur.');
+    renduEditeur();
+  } }, '✨ Remplir toutes les listes avec les mots significatifs des paroles')));
   if (s.sansListe) return;
   d[cleListe].forEach((item, i) => {
     const libelle = item.titre || item.nom || (item.titre_musique ? item.titre_musique + ' / ' + (item.titre_paroles || '?') : '') || '(sans titre)';
@@ -1638,12 +1648,24 @@ function renduEditeur() {
         h('button', { class: 'btn mini', disabled: i === d[cleListe].length - 1, onclick: () => { [d[cleListe][i + 1], d[cleListe][i]] = [d[cleListe][i], d[cleListe][i + 1]]; renduEditeur(); } }, '↓'),
         h('button', { class: 'btn mini', onclick: () => { if (confirm('Supprimer « ' + libelle + ' » ?')) { d[cleListe].splice(i, 1); renduEditeur(); } } }, '🗑')),
       (ongletEd === 'karaoke' || ongletEd === 'nuage' || ongletEd === 'plaque') ? h('div', { class: 'note large' }, '📄 Fichier lu si les paroles sont vides : paroles/' + nomFichierParoles(ongletEd === 'plaque' ? item.titre_paroles : item.titre)) : null,
+      ongletEd === 'nuage' ? h('div', { class: 'large', style: 'display:flex;gap:8px;align-items:center' },
+        h('button', { class: 'btn mini', type: 'button', onclick: async e => { e.preventDefault(); await remplirMotsNuage(item, true); renduEditeur(); } }, '✨ Remplir « Mots du nuage » avec les mots significatifs des paroles'),
+        h('span', { class: 'note' }, 'lit paroles/' + nomFichierParoles(item.titre) + ' sur le serveur ; vous pouvez ensuite modifier la liste')) : null,
       s.champs.map(c => champ(c, item))));
   });
   box.append(h('button', { class: 'btn', style: 'align-self:flex-start', onclick: () => {
     const n = {}; s.champs.forEach(c => n[c.k] = c.t === 'lignes' ? [] : (c.t === 'temps' || c.t === 'nombre') ? (c.k === 'duree' ? 8 : 0) : '');
     d[cleListe].push(n); renduEditeur(); box.scrollTop = box.scrollHeight;
   } }, ongletEd === 'blindcat' ? '+ Ajouter une catégorie' : ongletEd === 'plaque' ? '+ Ajouter une manche' : '+ Ajouter une chanson'));
+}
+// lit le fichier de paroles et met les mots significatifs dans la liste « Mots du nuage »
+async function remplirMotsNuage(item, avecMessage) {
+  const txt = await FichiersParoles.lire(item.titre);
+  if (!txt) { if (avecMessage) toast('Fichier introuvable ou vide : paroles/' + nomFichierParoles(item.titre)); return false; }
+  const max = Math.max(1, Number(brouillon.nuage.max_mots) || 20);
+  item.mots = choisirMotsNuage(txt, item, max).map(m => m.mot).join('\n');
+  if (avecMessage) toast('Liste remplie avec ' + item.mots.split('\n').length + ' mots des paroles : relisez-la et modifiez-la si besoin.');
+  return true;
 }
 function champ(c, obj) {
   const lab = h('label', { class: 'champ ' + (c.c || '') }, c.l);
