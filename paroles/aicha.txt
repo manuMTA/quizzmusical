@@ -1,12 +1,5 @@
 # Aïcha — Khaled
-# Utilisé dans : Jeu 1 – Nuage de mots (n° 2)
+# Utilisé dans (v2) : Jeu 1 – Nuage de mots (n° 2)
 # Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
 # Nuage de mots : jusqu'à 20 mots sont choisis automatiquement, sans les mots du titre ni de l'artiste.
-Comme si j'n'existais pas
-Reine 
-les perles, les bijoux
-pays d'ivoire 
-d'ebene
-poemes
-tresors
-je vaux mieux que tout ca
+
