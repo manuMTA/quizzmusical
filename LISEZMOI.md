@@ -6,11 +6,11 @@ La version 2 garde sa propre préparation, ses équipes et ses scores : elle ne 
 Les joueurs scannent le QR code affiché par l'animateur (📱 Rejoindre) et choisissent leur équipe.
 
 ## 2. Les 5 jeux
-1. **Nuage de mots** : les mots de la liste « Mots du nuage » de chaque chanson apparaissent un par un. Dans ✏️ Préparer → Jeu 1, le bouton **✨ Remplir toutes les listes avec les mots significatifs des paroles** prend dans chaque fichier `paroles/` jusqu'à 20 mots porteurs de sens (sans les petits mots, le titre ni l'artiste) ; relisez et retouchez les listes, puis Enregistrer. Quand le nuage est terminé, les paroles s'affichent (flèches ↓ ↑) ; « 🎉 Révéler » donne le titre.
-2. **Devine la chanson** : une seule équipe joue (choisie en haut). L'animateur fait défiler les chansons une par une : **flèche → (✓ OK)** = 1 point de manche et chanson suivante, **flèche ↓ (✗ Passer)** = chanson suivante sans point, **←** = revenir en arrière. 100 chansons sont déjà prêtes. Chrono par équipe réglable. « ➕ Au score général » ajoute les points de manche au score de l'équipe ; « ↺ Nouvelle manche » remet à zéro. « 🙈 Masquer le titre » cache le titre à l'écran.
+1. **Nuage de mots** : les mots de la liste « Mots du nuage » de chaque chanson apparaissent un par un. Dans ✏️ Préparer → Jeu 1, le bouton **✨ Remplir toutes les listes avec les mots significatifs des paroles** prend dans chaque fichier `paroles/` jusqu'à 20 mots porteurs de sens (sans les petits mots, le titre ni l'artiste) ; relisez et retouchez les listes, puis Enregistrer. Quand le nuage est complet, il reste 5 secondes à l'écran, puis les paroles s'affichent (flèches ↓ ↑) ; « 🎉 Révéler » donne le titre.
+2. **Devine la chanson** : une seule équipe joue (choisie en haut). Le jeu démarre sur un écran « Prêts ? » sans titre. Chrono compte à rebours de 2 minutes : « ⏱ Lancer le chrono » / « ⏸ Pause », « ↺ Chrono » le remet à 2:00 sans toucher aux chansons ni aux points. **Flèche → (✓ OK)** affiche la 1re chanson, puis donne 1 point de manche et passe à la suivante ; **flèche ↓ (✗ Passer)** passe sans point ; **←** revient en arrière. « ➕ Au score général » ajoute les points de manche au score de l'équipe ; « ↺ Nouvelle manche » remet les points de manche à zéro et revient à l'écran de départ. 100 chansons sont prêtes.
 3. **N'oubliez pas les paroles** : les équipes choisissent leur chanson ; les paroles s'affichent par écrans de 10 lignes, 7 ou 8 mots sont cachés par des ____ sur la 8e ligne de l'écran ; « 👀 Révéler » les affiche.
-4. **À côté de la plaque** : on joue une musique et l'écran affiche les paroles d'une autre chanson. En haut s'affichent les 2 chansons avec leurs auteurs (musique et paroles) ; « 🙈 Masquer les chansons » les cache si les équipes doivent les deviner.
-5. **Blind test par catégorie** : Séries TV, Rap, Chansons françaises, Ambiance, Décalé. On choisit la catégorie, puis on passe les extraits un par un ; « 🎉 Révéler » donne titre et artiste.
+4. **À côté de la plaque** : on joue une musique et l'écran affiche les paroles d'une autre chanson. Les 2 chansons (musique et paroles, avec leurs auteurs) sont masquées à chaque nouvelles paroles ; « 👁 Afficher les chansons » les dévoile.
+5. **Blind test par catégorie** : Séries TV, Rap, Chansons françaises, Titres 2024-2026. On choisit la catégorie, puis on passe les extraits un par un ; « 🎉 Révéler » donne titre et artiste.
 
 Buzzers : au premier buzz, la lampe de l'équipe s'allume ; **✓ Bonne réponse** (V) = +1 point, **✗ Mauvaise** (X) = l'équipe est hors jeu pour cette question.
 
@@ -183,6 +183,31 @@ JEU 4 — À CÔTÉ DE LA PLAQUE
 
 
 JEU 5 — BLIND TEST PAR CATÉGORIE
-(Séries TV · Rap · Chansons françaises · Ambiance · Décalé ; extraits à saisir dans ✏️ Préparer)
+(choisir la catégorie, puis les extraits un par un)
 ------------------------------------------------------------
-```
+  📺 Séries TV
+   1. I'll Be There for You (Friends) — The Rembrandts
+   2. Les Simpson (générique) — Danny Elfman
+   3. Game of Thrones (générique) — Ramin Djawadi
+   4. Stranger Things (générique) — Kyle Dixon & Michael Stein
+   5. Mission : Impossible (générique) — Lalo Schifrin
+  🎤 Rap
+   1. Je danse le Mia — IAM
+   2. Bouge de là — MC Solaar
+   3. Laisse pas traîner ton fils — Suprême NTM
+   4. Au DD — PNL
+   5. Tchikita — Jul
+  🇫🇷 Chansons françaises
+   1. La Vie en rose — Édith Piaf
+   2. Ne me quitte pas — Jacques Brel
+   3. Les Copains d'abord — Georges Brassens
+   4. Je te promets — Johnny Hallyday
+   5. Papaoutai — Stromae
+  🆕 Titres 2024-2026
+   1. Ninao — Gims
+   2. Parisienne — Gims & La Mano 1.9
+   3. Feel Good — Charlotte Cardin
+   4. Espresso — Sabrina Carpenter
+   5. APT. — Rosé & Bruno Mars
+   6. Mon BÉbÉ — Rnboi
+    Total : 21 extraits
