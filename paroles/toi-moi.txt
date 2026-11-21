@@ -1,0 +1,5 @@
+# Toi + Moi — Grégoire
+# Utilisé dans (v2) : Jeu 4 – À côté de la plaque (n° 5) : ces paroles s'affichent sur la musique de « Bella » (Gims)
+# Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
+# Ligne vide = nouveau paragraphe.
+

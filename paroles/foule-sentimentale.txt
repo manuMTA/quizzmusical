@@ -1,0 +1,5 @@
+# Foule sentimentale — Alain Souchon
+# Utilisé dans (v2) : Jeu 4 – À côté de la plaque (n° 4) : ces paroles s'affichent sur la musique de « Je veux » (Zaz)
+# Collez les paroles sous ces lignes. Les lignes qui commencent par # sont ignorées.
+# Ligne vide = nouveau paragraphe.
+
