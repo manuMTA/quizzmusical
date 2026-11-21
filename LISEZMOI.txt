@@ -1,0 +1,14 @@
+DOSSIER DES PAROLES
+====================
+Un fichier .txt par chanson, nommé d'après le titre (minuscules, sans accents, tirets) :
+  « Je t'emmène au vent »  ->  je-t-emmene-au-vent.txt
+Ouvrez le fichier, collez les paroles sous les lignes qui commencent par #, enregistrez (encodage UTF-8),
+puis déposez le dossier « paroles » sur GitHub, à côté de index.html.
+
+Règles :
+- Ligne vide = nouveau paragraphe.
+- [STOP] ou [STOP 1:23] seul sur une ligne = arrêt de la musique (jeu « Terminer les paroles ») ;
+  le paragraphe qui suit = paroles à trouver.
+- [1:05] au début d'un paragraphe = il s'affiche tout seul à ce moment de la chanson (facultatif).
+- Si des paroles sont saisies dans ✏️ Préparer, elles passent avant le fichier.
+- Pour une nouvelle chanson, créez simplement un fichier avec le bon nom.
